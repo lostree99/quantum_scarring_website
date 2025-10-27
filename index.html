@@ -1,163 +1,362 @@
-<!doctype html>
+<!--
+  quantum_scarring_site.html
+  - Single-file landing page with:
+    * Full-viewport hero background image + huge "Quantum Scarring" title
+    * Alice & Bob inspired palette (no purple) — navy/teal/coral/cream
+    * Funnel structure: intro -> easy ideas -> deeper -> references -> CTA
+    * Improved CSS scroll snapping (pure CSS, scroll-snap-stop) + smooth behavior
+    * Interactive double-pendulum canvas (simple RK4 integrator) for a "lil interactive"
+    * Navigation dots and Back-to-Top button with scroll-progress fill
+    * Hidden native scrollbar but still scrollable (works on desktop/mobile)
+    * Reference links included (replace or extend as desired)
+
+  Notes: Replace the example image URLs with high-res photos you like (Unsplash or your own).
+  To host on GitHub Pages: create a repo named <username>.github.io, push this file as index.html on main branch (or enable Pages from gh-pages branch).
+  See the bottom of this file for a short HOWTO for GitHub Pages.
+-->
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Quantum Scarring — Funnel</title>
-
-  <!-- Font Awesome (icons) -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
+  <title>Quantum Scarring — Where Classical Chaos Meets Quantum Order</title>
   <style>
-    /* ---------- Palette (Alice&Bob-inspired: dark + warm yellow accent) ---------- */
+    /* ----- Palette (Alice & Bob inspired, no purple) ----- */
     :root{
-      --bg: #050712;           /* page background */
-      --surface: #0b1220;      /* sections */
-      --text: #dfeaf0;         /* readable text */
-      --muted: #9fb0bf;
-      --accent: #ffd400;       /* warm yellow accent (Alice&Bob style highlight) */
-      --accent-2: #00d1ff;     /* secondary cyan-ish accent for small highlights */
-      --glass: rgba(255,255,255,0.03);
-      --radius: 12px;
-      --progress: 0%;          /* for back-to-top progress ring */
+      --bg:#071126;           /* deep navy */
+      --panel:#0f2436;        /* slightly lighter navy */
+      --teal:#00c2d1;         /* bright teal/cyan accent */
+      --coral:#ff7a59;        /* warm coral accent */
+      --cream:#f6f7f9;        /* light text */
+      --glass: rgba(255,255,255,0.04);
+      --glass-strong: rgba(255,255,255,0.08);
+      --shadow: 0 12px 30px rgba(2,6,23,0.6);
     }
 
-    /* ---------- page layout and hide scrollbar (still scrollable) ---------- */
-    *{box-sizing:border-box;font-family:Inter, "Segoe UI", Roboto, Arial, sans-serif}
-    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);overflow-y:scroll;scroll-behavior:smooth}
-    /* Hide visible scrollbar but keep scrollable */
-    html { scrollbar-width: none; -ms-overflow-style: none; }
-    html::-webkit-scrollbar { display:none; }
-
-    /* ---------- scroll-snap funnel ---------- */
-    html { scroll-snap-type: y proximity; }
-    section { min-height:100vh; padding:4rem 2rem; display:flex; align-items:center; justify-content:center; position:relative; scroll-snap-align:start; }
-    .container { max-width:1100px; width:100%; z-index:2; }
-
-    /* ---------- HERO full-screen image + huge text ---------- */
-    #hero {
-      position:relative;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      color:var(--text);
-      background: center/cover no-repeat url('https://upload.wikimedia.org/wikipedia/commons/2/29/DoublePendulumLongShutter.jpg');
+    /* Reset */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;}
+    body{
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: linear-gradient(180deg,var(--bg) 0%, #071831 100%);
+      color:var(--cream);
+      -webkit-font-smoothing:antialiased;
+      overflow-y:scroll; /* allow scrolling but hide visuals below */
+      scroll-behavior:smooth;
+      scroll-snap-type: y mandatory;
     }
-    #hero::after { /* dark overlay */
-      content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(5,6,18,0.55), rgba(5,6,18,0.35)); z-index:1;
+
+    /* Hide native scrollbar but keep scrolling */
+    /* Chrome, Edge, Safari */
+    body::-webkit-scrollbar{width:0;height:0}
+    /* Firefox */
+    html{scrollbar-width:none}
+
+    section{min-height:100vh;padding:6rem 2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;scroll-snap-align:start;scroll-snap-stop:always}
+
+    /* Hero - full-viewport background and huge title */
+    #hero{padding:0;min-height:100vh;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    #hero .hero-bg{
+      position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1502134249126-9f3755a50d78?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+      background-size:cover;background-position:center;filter:brightness(0.45) contrast(1.05);
+      z-index:0;transform:scale(1.02);
     }
-    .hero-inner { position:relative; z-index:2; padding:6rem 1rem; }
-    .hero-title { font-weight:800; font-size:clamp(48px, 9vw, 120px); line-height:0.9; letter-spacing:-1px; margin-bottom:0.4rem; color:var(--text); text-shadow: 0 12px 40px rgba(0,0,0,0.7); }
-    .hero-sub { font-size:clamp(16px, 2.2vw, 20px); color:var(--muted); margin-bottom:1.4rem; }
+    .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,17,38,0.55),rgba(4,10,20,0.6));z-index:1}
+    .hero-inner{position:relative;z-index:2;max-width:1200px;padding:6rem 2rem;text-align:center}
 
-    /* ---------- funnel sections: Basics -> Intermediate -> Advanced -> Resources ---------- */
-    .funnel-stage { background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(0,0,0,0.06)); border-radius:var(--radius); padding:2.2rem; box-shadow:0 12px 30px rgba(2,6,14,0.55); border:1px solid rgba(255,255,255,0.03); }
-    .stage-title { font-size:1.6rem; color:var(--text); margin-bottom:0.6rem; font-weight:700; display:flex; gap:0.75rem; align-items:center; }
-    .stage-pill { font-size:0.86rem; color:#081018; background:var(--accent); padding:0.25rem 0.6rem; border-radius:8px; font-weight:700; }
+    h1.hero-title{font-size:clamp(48px,9vw,120px);line-height:0.9;margin-bottom:0.6rem;font-weight:800;letter-spacing:-1px;color:transparent;background:linear-gradient(90deg,var(--teal),var(--coral));-webkit-background-clip:text;background-clip:text;text-shadow:0 20px 60px rgba(2,8,20,0.7)}
+    p.lead{font-size:1.2rem;opacity:0.9;max-width:880px;margin:1rem auto 2rem}
 
-    /* ---------- visualization container ---------- */
-    .visualization-container { height:420px; border-radius:10px; overflow:hidden; margin-top:1rem; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12)); border:1px solid rgba(255,255,255,0.03); position:relative; }
+    .cta-row{display:flex;gap:1rem;align-items:center;justify-content:center;flex-wrap:wrap}
+    .btn{padding:0.9rem 1.6rem;border-radius:999px;background:var(--teal);color:var(--bg);font-weight:600;text-decoration:none;box-shadow:var(--shadow);border:none}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--cream)}
 
-    /* ---------- nav dots (right) ---------- */
-    .nav-dots { position:fixed; right:1.25rem; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:0.7rem; z-index:80; }
-    .dot { width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.12);cursor:pointer;display:flex;align-items:center;justify-content:center; }
-    .dot.active{ background:conic-gradient(var(--accent) 0 100%, transparent 0); box-shadow:0 6px 18px rgba(0,0,0,0.6); transform:scale(1.08); }
-    .dot-label{ position:absolute; right:22px; top:50%; transform:translateY(-50%); background:rgba(4,7,12,0.85); color:var(--muted); padding:0.28rem 0.6rem; border-radius:10px; font-size:0.85rem; opacity:0; pointer-events:none; transition:opacity .14s; }
-    .dot:hover .dot-label{ opacity:1; }
+    /* Funnel sections */
+    .section-title{font-size:2rem;margin-bottom:1rem;color:var(--cream)}
+    .content{max-width:900px;font-size:1.05rem;line-height:1.6;color:rgba(246,247,249,0.92);text-align:center}
 
-    /* ---------- back to top / progress button (bottom-right) ---------- */
-    .back-top {
-      position:fixed; right:1.25rem; bottom:1.25rem; width:56px; height:56px; border-radius:50%; display:grid; place-items:center;
-      background: conic-gradient(var(--accent) var(--progress), rgba(255,255,255,0.06) var(--progress));
-      box-shadow:0 8px 28px rgba(0,0,0,0.5);
-      border:1px solid rgba(255,255,255,0.06); cursor:pointer; z-index:90;
-      transition: transform .18s, opacity .18s, visibility .18s;
-      opacity:0; visibility:hidden; transform:translateY(10px);
-    }
-    .back-top.show { opacity:1; visibility:visible; transform:translateY(0); }
-    .back-top .arrow { color:#071018; font-weight:900; font-size:1.1rem; background:linear-gradient(90deg, #fff, rgba(255,255,255,0.95)); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .back-top.hidden-at-top { opacity:0; visibility:hidden; pointer-events:none; }
+    .visualization-container{width:100%;max-width:1100px;height:420px;margin:2rem 0;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.04);box-shadow:var(--shadow);overflow:hidden;padding:0}
 
-    /* ---------- simple responsive ---------- */
-    @media (max-width:900px){
-      .nav-dots{ right:0.6rem; }
-      .back-top{ right:0.6rem; bottom:0.9rem; }
-      .visualization-container{ height:300px; }
-    }
+    /* Nav dots */
+    .nav-dots{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:12px}
+    .dot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.16);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+    .dot.active{background:conic-gradient(var(--teal),var(--coral))}
+    .dot-label{position:absolute;right:28px;top:50%;transform:translateY(-50%);background:var(--panel);padding:6px 10px;border-radius:999px;font-size:12px;opacity:0;transition:0.18s;pointer-events:none}
+    .dot:hover .dot-label{opacity:1}
+
+    /* Back to top with progress ring */
+    .back-top{position:fixed;right:18px;bottom:18px;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,var(--panel),#0b2330);box-shadow:var(--shadow);z-index:70;border:1px solid rgba(255,255,255,0.04);cursor:pointer;transform:translateY(0);opacity:0;transition:0.25s;backdrop-filter: blur(6px)}
+    .back-top.visible{opacity:1;transform:translateY(0)}
+    .back-top svg{width:54px;height:54px}
+    .back-top .arrow{font-size:14px;color:var(--cream)}
+
+    /* References list */
+    .refs{display:flex;flex-direction:column;gap:10px;max-width:900px;text-align:left}
+    .ref-item{background:var(--glass);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+
+    /* small screens */
+    @media(max-width:800px){.nav-dots{right:8px}.hero-title{font-size:clamp(40px,12vw,80px)}.visualization-container{height:320px}}
+
+    /* subtle animations */
+    .fade{opacity:0;transform:translateY(18px);transition:opacity 0.6s ease,transform 0.6s ease}
+    .fade.visible{opacity:1;transform:none}
   </style>
 </head>
 <body>
 
-  <!-- nav dots -->
-  <div class="nav-dots" aria-hidden="false">
-    <div class="dot active" data-section="hero"><span class="dot-label">Intro</span></div>
-    <div class="dot" data-section="basics"><span class="dot-label">Basics</span></div>
-    <div class="dot" data-section="intermediate"><span class="dot-label">Intermediate</span></div>
-    <div class="dot" data-section="advanced"><span class="dot-label">Advanced</span></div>
-    <div class="dot" data-section="resources"><span class="dot-label">Resources</span></div>
+  <!-- Navigation Dots -->
+  <div class="nav-dots" aria-hidden>
+    <div class="dot active" data-target="hero"><span class="dot-label">Intro</span></div>
+    <div class="dot" data-target="chaos"><span class="dot-label">Classical Chaos</span></div>
+    <div class="dot" data-target="trapped"><span class="dot-label">Trapped Ions</span></div>
+    <div class="dot" data-target="scarring"><span class="dot-label">Quantum Scars</span></div>
+    <div class="dot" data-target="interactive"><span class="dot-label">Play</span></div>
+    <div class="dot" data-target="refs"><span class="dot-label">References</span></div>
   </div>
 
-  <!-- BACK TO TOP / PROGRESS BUTTON -->
-  <button id="backTop" class="back-top hidden-at-top" aria-label="Back to top">
-    <span class="arrow"><i class="fas fa-arrow-up"></i></span>
+  <!-- Back to top with progress ring -->
+  <button id="backTop" class="back-top" title="Back to top" aria-label="Back to top">
+    <svg viewBox="0 0 36 36">
+      <path id="progress" d="M18 2.5 a 15.5 15.5 0 1 1 0 31 a 15.5 15.5 0 1 1 0 -31" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"></path>
+      <path id="progressActive" d="M18 2.5 a 15.5 15.5 0 1 1 0 31 a 15.5 15.5 0 1 1 0 -31" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round" stroke-dasharray="97.3" stroke-dashoffset="97.3"></path>
+      <defs>
+        <linearGradient id="g" x1="0" x2="1">
+          <stop offset="0%" stop-color="var(--teal)" />
+          <stop offset="100%" stop-color="var(--coral)" />
+        </linearGradient>
+      </defs>
+      <g transform="translate(9,12)"><text x="0" y="10" class="arrow" fill="var(--cream)" font-size="7">↑</text></g>
+    </svg>
   </button>
 
   <!-- HERO -->
   <section id="hero">
-    <div class="container hero-inner">
-      <h1 class="hero-title">Quantum<br>Scarring</h1>
-      <p class="hero-sub">Where classical chaos leaves marks on quantum wavefunctions — from intuition to experiments.</p>
-      <div style="display:flex;gap:0.6rem;justify-content:center;margin-top:1.2rem;">
-        <a class="cta" href="#basics" style="background:var(--accent);color:#071018;padding:0.7rem 1.1rem;border-radius:999px;font-weight:700;text-decoration:none;">Start: Basics</a>
-        <a class="cta" href="#resources" style="border:1px solid rgba(255,255,255,0.06);color:var(--text);padding:0.7rem 1.1rem;border-radius:999px;text-decoration:none;">References</a>
+    <div class="hero-bg" aria-hidden></div>
+    <div class="hero-overlay" aria-hidden></div>
+    <div class="hero-inner">
+      <h1 class="hero-title">Quantum Scarring</h1>
+      <p class="lead">Where classical chaos leaves fingerprints on quantum systems — a short tour from intuition to applications in quantum hardware.</p>
+      <div class="cta-row">
+        <a class="btn" href="#chaos">Start with Chaos</a>
+        <a class="btn ghost" href="#interactive">Try an Interactive</a>
       </div>
     </div>
   </section>
 
-  <!-- FUNNEL: Basics -->
-  <section id="basics" style="background:var(--surface);">
-    <div class="container funnel-stage">
-      <div class="stage-title"><span class="stage-pill">1</span><span>Basics — Intuition</span></div>
-      <p style="color:var(--muted)">Short visual ideas and an interactive Bunimovich stadium (click to add particles). Good for outreach & early demos.</p>
+  <!-- CHAOS -->
+  <section id="chaos">
+    <h2 class="section-title fade">The Chaos Beneath</h2>
+    <p class="content fade" style="margin-top:12px">Chaotic classical systems — like the double pendulum or billiard systems — are extremely sensitive to initial conditions. Small changes blow up exponentially and make long-term prediction impossible. Still, when we build the corresponding quantum system, surprising "scars" can appear in eigenfunctions, tracing unstable classical orbits.</p>
 
-      <div class="visualization-container" style="margin-top:1rem;">
-        <canvas id="billiard-canvas"></canvas>
+    <div class="visualization-container fade">
+      <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:18px;color:var(--cream)">
+        <img src="https://images.unsplash.com/photo-1529006557814-260b4cb55f90?ixlib=rb-4.0.3&auto=format&fit=crop&w=1800&q=80" alt="double pendulum long exposure" style="max-height:100%;max-width:100%;object-fit:cover;border-radius:8px;filter:brightness(0.75)">
       </div>
     </div>
   </section>
 
-  <!-- FUNNEL: Intermediate -->
-  <section id="intermediate">
-    <div class="container funnel-stage">
-      <div class="stage-title"><span class="stage-pill">2</span><span>Intermediate — Modeling</span></div>
-      <p style="color:var(--muted)">A roadmap for simple semiclassical numerics, how scarring appears in eigenmodes, and small experiments you can run on trapped-ion setups.</p>
-    </div>
-  </section>
+  <!-- TRAPPED IONS -->
+  <section id="trapped">
+    <h2 class="section-title fade">Trapped Ions: Quantum Billiards</h2>
+    <p class="content fade">Ion traps can act like tiny billiard tables where wavefunctions live. By shaping the trap and control fields, experimentalists can tune how qubits couple to modes and engineer resilience against noise.</p>
 
-  <!-- FUNNEL: Advanced -->
-  <section id="advanced" style="background:var(--surface);">
-    <div class="container funnel-stage">
-      <div class="stage-title"><span class="stage-pill">3</span><span>Advanced — Research</span></div>
-      <p style="color:var(--muted)">Notes on thesis-quality experiments, numerical techniques, and suggestions for hardware-relevant scarring control.</p>
-    </div>
-  </section>
-
-  <!-- RESOURCES -->
-  <section id="resources">
-    <div class="container funnel-stage">
-      <div class="stage-title"><span class="stage-pill">4</span><span>Resources & Hosting</span></div>
-      <p style="color:var(--muted)">References (Heller 1984, reviews) and image attributions. The site uses a separate `app.js` file — see below for deployment steps.</p>
-      <div style="margin-top:1rem; color:var(--muted); font-size:0.92rem;">
-        <ul>
-          <li>Heller, E. J., *Scars of Periodic Orbits*, PRL 1984 (classic).</li>
-          <li>Images / inspiration: Wikimedia Commons & Alice & Bob site (branding inspiration). :contentReference[oaicite:1]{index=1}</li>
-          <li>GitHub Pages serves static HTML/CSS/JS — perfect for this project. :contentReference[oaicite:2]{index=2}</li>
-        </ul>
+    <div class="visualization-container fade">
+      <div style="display:flex;align-items:center;justify-content:center;height:100%">
+        <img src="https://images.unsplash.com/photo-1581093588401-8b46a3f5d4a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1800&q=80" alt="ion trap" style="max-height:100%;max-width:100%;object-fit:cover;filter:brightness(0.78)">
       </div>
     </div>
   </section>
 
-  <script src="app.js" defer></script>
+  <!-- SCARRING -->
+  <section id="scarring">
+    <h2 class="section-title fade">Quantum Scarring — Ghosts of Classical Orbits</h2>
+    <p class="content fade">Eric Heller first documented that some quantum eigenfunctions concentrate along unstable periodic orbits of the classical system — these are "scars." They can change how a quantum device behaves and open avenues for new control strategies.</p>
+
+    <div class="visualization-container fade">
+      <div style="display:flex;align-items:center;justify-content:center;height:100%">
+        <img src="https://images.unsplash.com/photo-1541532713592-79a0317b6b77?ixlib=rb-4.0.3&auto=format&fit=crop&w=1800&q=80" alt="quantum waves" style="max-height:100%;max-width:100%;object-fit:cover;filter:brightness(0.7)">
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE -->
+  <section id="interactive">
+    <h2 class="section-title fade">Interactive: Double Pendulum</h2>
+    <p class="content fade">A simple double-pendulum simulation to visualize sensitivity to initial conditions. Try changing the two initial angles, click <strong>Play</strong>, and watch trajectories diverge.</p>
+
+    <div class="visualization-container" style="height:520px">
+      <div style="display:flex;height:100%">
+        <!-- Left: canvas -->
+        <div style="flex:1;display:flex;flex-direction:column;padding:14px">
+          <canvas id="dpCanvas" style="flex:1;border-radius:8px;background:linear-gradient(180deg, rgba(2,6,23,0.6), rgba(6,12,30,0.8));border:1px solid rgba(255,255,255,0.03);"></canvas>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
+            <button id="playBtn" class="btn">Play</button>
+            <button id="resetBtn" class="btn ghost">Reset</button>
+            <label style="margin-left:8px;font-size:13px">θ1 <input id="a1" type="range" min="-3.14" max="3.14" step="0.01" value="1.0"></label>
+            <label>θ2 <input id="a2" type="range" min="-3.14" max="3.14" step="0.01" value="1.05"></label>
+          </div>
+        </div>
+
+        <!-- Right: explanation -->
+        <div style="width:360px;padding:18px;display:flex;flex-direction:column;gap:10px;align-items:start;justify-content:center">
+          <div style="background:var(--glass);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)">
+            <strong>Tip</strong>: start with tiny differences between θ1 and θ2 (e.g., 1.000 vs 1.003) and run the sim twice to see divergence.
+          </div>
+          <div style="background:var(--glass);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)">
+            <strong>Physics</strong>: the double pendulum is a simple chaotic system with 2 degrees of freedom and sensitive dependence on initial conditions.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REFERENCES -->
+  <section id="refs">
+    <h2 class="section-title fade">References & Further Reading</h2>
+    <div class="content fade refs">
+      <div class="ref-item"><strong>Heller (1984)</strong>: E. J. Heller, "Bound-State Eigenfunctions of Classically Chaotic Hamiltonian Systems: Scars of Periodic Orbits." <a href="https://link.aps.org/doi/10.1103/PhysRevLett.53.1515" target="_blank" rel="noopener" style="color:var(--teal)">Phys. Rev. Lett. (1984)</a></div>
+      <div class="ref-item"><strong>Review — Many-body scars</strong>: A pedagogical review on quantum many-body scars and connections: <a href="https://arxiv.org/abs/2109.00548" target="_blank" rel="noopener" style="color:var(--teal)">arXiv:2109.00548</a></div>
+      <div class="ref-item"><strong>Double Pendulum — build/visualize</strong>: A hands-on tutorial for building a double pendulum visualization. <a href="https://www.instructables.com/Visualizing-Chaos-With-the-Double-Pendulum/" target="_blank" rel="noopener" style="color:var(--teal)">Instructables</a></div>
+      <div class="ref-item"><strong>Quantum chaos in billiards — figures & visualizations</strong>: see surveys and figure collections (search "quantum chaos billiards" or check semantic scholar figure galleries).</div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="cta">
+    <h2 class="section-title fade">Get Involved</h2>
+    <p class="content fade">If you want, I can: (1) tailor this page for your lab branding, (2) swap in high-res images (I can suggest specific Unsplash/Creative Commons options), (3) add a billiard interactive instead of the double pendulum.</p>
+    <div style="margin-top:18px"><a class="btn" href="#hero">Back to top</a></div>
+  </section>
+
+  <footer style="padding:28px;text-align:center;background:transparent;border-top:1px solid rgba(255,255,255,0.03)">Quantum Scarring Research • © <span id="yr"></span></footer>
+
+  <script>
+    // ----------------------- Simple helpers -----------------------
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    // Fade-in observer
+    const faders = document.querySelectorAll('.fade');
+    const obs = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); })
+    }, {threshold: 0.12});
+    faders.forEach(f=>obs.observe(f));
+
+    // Navigation dots
+    const dots = document.querySelectorAll('.nav-dots .dot');
+    const sections = document.querySelectorAll('section');
+    dots.forEach(dot=>dot.addEventListener('click', ()=>{
+      const id = dot.dataset.target; document.getElementById(id).scrollIntoView({behavior:'smooth'});
+    }));
+
+    // Update active dot on scroll (center of viewport)
+    function updateActiveDot(){
+      const mid = window.scrollY + window.innerHeight/2;
+      let current = sections[0].id;
+      sections.forEach(s=>{ const top=s.offsetTop; const h=s.clientHeight; if(mid>=top && mid<top+h) current = s.id; });
+      dots.forEach(d=> d.classList.toggle('active', d.dataset.target===current));
+    }
+    window.addEventListener('scroll', updateActiveDot, {passive:true});
+    updateActiveDot();
+
+    // Back to top + progress
+    const backTop = document.getElementById('backTop');
+    const progressActive = document.getElementById('progressActive');
+    const totalLen = progressActive.getTotalLength();
+    progressActive.style.strokeDasharray = totalLen;
+    function updateProgress(){
+      const scrollTop = window.scrollY; const docH = document.body.scrollHeight - window.innerHeight;
+      const pct = docH>0 ? Math.min(1, scrollTop/docH) : 0;
+      const dash = totalLen * (1 - pct);
+      progressActive.style.strokeDashoffset = dash;
+      // show after 3% down, hide at top
+      backTop.classList.toggle('visible', scrollTop>window.innerHeight*0.03);
+    }
+    window.addEventListener('scroll', updateProgress, {passive:true});
+    backTop.addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
+    updateProgress();
+
+    // ----------------------- Double pendulum interactive (simple RK4) -----------------------
+    (function(){
+      const canvas = document.getElementById('dpCanvas');
+      const ctx = canvas.getContext('2d');
+      function resize(){ canvas.width = canvas.clientWidth * devicePixelRatio; canvas.height = canvas.clientHeight * devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+      window.addEventListener('resize', resize); resize();
+
+      // state: [theta1, theta2, omega1, omega2]
+      let stateA = [1.0,1.05,0,0];
+      let stateB = [1.002,1.052,0,0]; // slightly perturbed for divergence visualization
+      const l1=160, l2=160, m1=1, m2=1, g=9.81;
+      let running=false; let last=performance.now();
+
+      const playBtn = document.getElementById('playBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const a1 = document.getElementById('a1');
+      const a2 = document.getElementById('a2');
+
+      function deriv(s){
+        const [t1,t2,w1,w2]=s; const d = 2*m1 + m2 - m2*Math.cos(2*t1-2*t2);
+        const dw1 = (-g*(2*m1+m2)*Math.sin(t1) - m2*g*Math.sin(t1-2*t2) - 2*Math.sin(t1-t2)*m2*(w2*w2*l2 + w1*w1*l1*Math.cos(t1-t2)))/(l1*d);
+        const dw2 = (2*Math.sin(t1-t2)*(w1*w1*l1*(m1+m2) + g*(m1+m2)*Math.cos(t1) + w2*w2*l2*m2*Math.cos(t1-t2)))/(l2*d);
+        return [w1,w2,dw1,dw2];
+      }
+
+      function rk4(s,dt){
+        const k1 = deriv(s);
+        const s2 = s.map((v,i)=>v + k1[i]*dt/2);
+        const k2 = deriv(s2);
+        const s3 = s.map((v,i)=>v + k2[i]*dt/2);
+        const k3 = deriv(s3);
+        const s4 = s.map((v,i)=>v + k3[i]*dt);
+        const k4 = deriv(s4);
+        return s.map((v,i)=> v + dt*(k1[i]+2*k2[i]+2*k3[i]+k4[i])/6 );
+      }
+
+      function step(dt){ stateA = rk4(stateA,dt); stateB = rk4(stateB,dt); }
+
+      function draw(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        const W = canvas.clientWidth, H = canvas.clientHeight;
+        ctx.save(); ctx.translate(W/2, H/3);
+
+        // draw both pendulums: A in teal, B in coral (translucent)
+        function drawState(s, color, alpha){
+          const [t1,t2] = s; const x1 = l1*Math.sin(t1), y1 = l1*Math.cos(t1); const x2 = x1 + l2*Math.sin(t2), y2 = y1 + l2*Math.cos(t2);
+          ctx.beginPath(); ctx.lineWidth = 3; ctx.strokeStyle = color; ctx.globalAlpha = alpha; ctx.moveTo(0,0); ctx.lineTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+          ctx.globalAlpha = alpha*0.95; ctx.beginPath(); ctx.arc(x1,y1,8,0,Math.PI*2); ctx.fillStyle=color; ctx.fill();
+          ctx.beginPath(); ctx.arc(x2,y2,7,0,Math.PI*2); ctx.fill();
+        }
+        drawState(stateB, 'rgba(255,122,89,0.65)', 0.9);
+        drawState(stateA, 'rgba(0,194,209,0.95)', 1.0);
+
+        ctx.restore();
+      }
+
+      function loop(t){
+        const dt = Math.min(0.03,(t-last)/1000); last=t;
+        if(running){ for(let i=0;i<2;i++) step(dt/2); }
+        draw(); requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+
+      playBtn.addEventListener('click', ()=>{ running = !running; playBtn.textContent = running ? 'Pause' : 'Play'; });
+      resetBtn.addEventListener('click', ()=>{ stateA=[parseFloat(a1.value),parseFloat(a2.value),0,0]; stateB=[parseFloat(a1.value)+0.002,parseFloat(a2.value)+0.002,0,0]; running=false; playBtn.textContent='Play'; });
+
+      // sync sliders to initial
+      a1.addEventListener('input', ()=>{ stateA[0]=parseFloat(a1.value); stateB[0]=parseFloat(a1.value)+0.002 });
+      a2.addEventListener('input', ()=>{ stateA[1]=parseFloat(a2.value); stateB[1]=parseFloat(a2.value)+0.002 });
+    })();
+
+    // Accessibility: keyboard shortcut 'T' to toggle top
+    window.addEventListener('keydown', (e)=>{ if(e.key.toLowerCase()==='t') window.scrollTo({top:0,behavior:'smooth'}); });
+
+  </script>
+
+  <!-- GitHub Pages HOWTO (visible on page bottom) -->
+  <script>
+    // Insert a small HOWTO as a collapsible console when the page loads (so you can copy-paste quickly)
+    const howto = `\n--- GitHub Pages quick HOWTO ---\n1) Create a public repo named: YOURUSERNAME.github.io\n2) Add this file as index.html in the repo root and commit+push to main (or default branch).\n3) Visit https://YOURUSERNAME.github.io in ~1-5 minutes.\n4) If you already have a repo, enable Pages in Settings -> Pages, choose the branch and folder (root).\n5) For assets (images/CSS) make a folder /assets and reference them relatively.\n\nNeed a git command cheat-sheet? I can paste one for you.`;
+    console.log(howto);
+  </script>
 </body>
 </html>

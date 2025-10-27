@@ -1,663 +1,812 @@
-<!--
-  quantum_scarring_site.html
-  Updated: Alice & Bob dark theme with warm yellow highlight, integrated chaos & scar canvases,
-  improved double-pendulum speed + trails, added speed & trail controls, expanded explanatory text
-  so visitors can actually understand quantum scars, removed visuals-gradient overlays that cut
-  through images (visual containers are transparent), and fixed DPR canvas sizing.
-
-  To swap images: replace the Unsplash URLs used in <img> tags or put assets in /assets/ and update paths.
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Quantum Scarring — Where Classical Chaos Meets Quantum Order</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quantum Scarring - Where Classical Chaos Meets Quantum Order</title>
   <style>
-    /* ----- Alice & Bob inspired dark theme with warm yellow highlight ----- */
-    :root{
-      --bg:#05060a;           /* near-black navy */
-      --panel:#0b1220;        /* card panel */
-      --accent:#ffd166;       /* warm yellow highlight */
-      --accent-2:#ffb703;     /* secondary warm yellow */
-      --muted:#9aa8b2;        /* muted copy */
-      --cream:#f6f7f9;        /* light text */
-      --glass: rgba(255,255,255,0.03);
-      --glass-strong: rgba(255,255,255,0.06);
-      --shadow: 0 12px 30px rgba(2,6,23,0.7);
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html { scroll-behavior: smooth; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #0a0e17;
+      color: #e8eaed;
+      line-height: 1.6;
+      overflow-x: hidden;
     }
-
-    /* Reset */
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;}
-    body{
-      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-      background: linear-gradient(180deg,var(--bg) 0%, #061122 100%);
-      color:var(--cream);
-      -webkit-font-smoothing:antialiased;
-      overflow-y:scroll; /* keep scrolling but hide scroll visuals */
-      scroll-behavior:smooth;
-      scroll-snap-type:y mandatory;
+    
+    /* Section styling - clean, no gradients */
+    section {
+      min-height: 100vh;
+      padding: 4rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
     }
-
-    /* Hide native scrollbar but keep scroll functionality */
-    body::-webkit-scrollbar{width:0;height:0}
-    html{scrollbar-width:none}
-
-    section{min-height:100vh;padding:6rem 2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;scroll-snap-align:start;scroll-snap-stop:always}
-
-    /* HERO */
-    #hero{padding:0;min-height:100vh;align-items:center;justify-content:center;position:relative;overflow:hidden}
-    #hero .hero-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1502134249126-9f3755a50d78?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');background-size:cover;background-position:center;filter:brightness(0.35) contrast(1.05);z-index:0;transform:scale(1.02)}
-    .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,6,12,0.55),rgba(3,8,16,0.6));z-index:1}
-    .hero-inner{position:relative;z-index:2;max-width:1200px;padding:6rem 2rem;text-align:center}
-
-    h1.hero-title{font-size:clamp(48px,9vw,120px);line-height:0.9;margin-bottom:0.6rem;font-weight:800;letter-spacing:-1px;color:transparent;background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;text-shadow:0 20px 60px rgba(2,8,20,0.7)}
-    p.lead{font-size:1.15rem;opacity:0.95;max-width:880px;margin:1rem auto 2rem;color:var(--muted)}
-
-    .cta-row{display:flex;gap:1rem;align-items:center;justify-content:center;flex-wrap:wrap}
-    .btn{padding:0.9rem 1.6rem;border-radius:999px;background:var(--accent);color:var(--bg);font-weight:600;text-decoration:none;box-shadow:var(--shadow);border:none}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--cream)}
-
-    /* Funnel sections */
-    .section-title{font-size:2rem;margin-bottom:1rem;color:var(--cream)}
-    .content{max-width:900px;font-size:1.05rem;line-height:1.6;color:var(--muted);text-align:center}
-
-    /* make visualization containers transparent so pictures are not 'cut' by gradients */
-    .visualization-container{width:100%;max-width:1100px;height:420px;margin:2rem 0;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,0.03);box-shadow:var(--shadow);overflow:hidden;padding:0}
-    .visualization-container canvas, .visualization-container img{width:100%;height:100%;display:block;object-fit:cover}
-
-    /* Nav dots */
-    .nav-dots{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:12px}
-    .dot{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
-    .dot.active{background:conic-gradient(var(--accent), var(--accent-2))}
-    .dot-label{position:absolute;right:28px;top:50%;transform:translateY(-50%);background:var(--panel);padding:6px 10px;border-radius:999px;font-size:12px;opacity:0;transition:0.18s;pointer-events:none}
-    .dot:hover .dot-label{opacity:1}
-
-    /* Back to top with progress ring */
-    .back-top{position:fixed;right:18px;bottom:18px;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,var(--panel),#071525);box-shadow:var(--shadow);z-index:70;border:1px solid rgba(255,255,255,0.04);cursor:pointer;transform:translateY(0);opacity:0;transition:0.25s;backdrop-filter: blur(6px)}
-    .back-top.visible{opacity:1;transform:translateY(0)}
-    .back-top svg{width:54px;height:54px}
-    .back-top .arrow{font-size:14px;color:var(--cream)}
-
-    /* References list */
-    .refs{display:flex;flex-direction:column;gap:10px;max-width:900px;text-align:left}
-    .ref-item{background:var(--glass);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
-
-    /* Controls inside visual containers */
-    .vis-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
-
-    @media(max-width:800px){.nav-dots{right:8px}.hero-title{font-size:clamp(40px,12vw,80px)}.visualization-container{height:320px}}
-
-    /* subtle animations */
-    .fade{opacity:0;transform:translateY(18px);transition:opacity 0.6s ease,transform 0.6s ease}
-    .fade.visible{opacity:1;transform:none}
-
-    /* small helper for canvas sizing containers */
-    .canvas-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-
-    /* extra styling for explanatory blocks */
-    .explain{max-width:900px;text-align:left;color:var(--muted);background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:18px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
-    .explain h4{color:var(--cream);margin-bottom:8px}
-    .klist{margin-left:18px}
+    
+    section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .container {
+      max-width: 900px;
+      width: 100%;
+    }
+    
+    /* Typography */
+    h1 {
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 800;
+      margin-bottom: 1rem;
+      color: #ffd166;
+      text-align: center;
+      line-height: 1.1;
+    }
+    
+    h2 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #ffd166;
+      text-align: center;
+    }
+    
+    h3 {
+      font-size: 1.5rem;
+      color: #ffd166;
+      margin: 2rem 0 1rem;
+    }
+    
+    p {
+      font-size: 1.1rem;
+      color: #b8c1cc;
+      margin-bottom: 1rem;
+      line-height: 1.8;
+    }
+    
+    .highlight {
+      background: rgba(255, 209, 102, 0.1);
+      border-left: 3px solid #ffd166;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      border-radius: 4px;
+    }
+    
+    .highlight strong {
+      color: #ffd166;
+    }
+    
+    /* Canvas containers - solid backgrounds */
+    .canvas-container {
+      width: 100%;
+      max-width: 800px;
+      height: 500px;
+      margin: 2rem auto;
+      background: #131820;
+      border: 2px solid #1e2936;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      margin: 0.5rem;
+      background: #ffd166;
+      color: #0a0e17;
+      border: none;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+    
+    .btn:hover {
+      background: #ffb703;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(255, 209, 102, 0.3);
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid #ffd166;
+      color: #ffd166;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 209, 102, 0.1);
+    }
+    
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    
+    /* Progress indicator */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: #ffd166;
+      z-index: 1000;
+      transition: width 0.1s ease;
+    }
+    
+    /* Section navigation dots */
+    .nav-dots {
+      position: fixed;
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .nav-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-dot.active {
+      background: #ffd166;
+      transform: scale(1.3);
+    }
+    
+    .nav-dot:hover {
+      background: #ffd166;
+    }
+    
+    /* Hero section */
+    #hero {
+      background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
+      min-height: 100vh;
+    }
+    
+    .hero-content {
+      text-align: center;
+    }
+    
+    .subtitle {
+      font-size: 1.3rem;
+      color: #8a95a5;
+      margin-bottom: 2rem;
+    }
+    
+    /* Chaos explanation */
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    
+    @media (max-width: 768px) {
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+      
+      .nav-dots {
+        right: 1rem;
+      }
+    }
+    
+    /* Info card */
+    .info-card {
+      background: #131820;
+      border: 1px solid #1e2936;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+    
+    /* Instructions overlay */
+    .instructions {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: rgba(19, 24, 32, 0.95);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ffd166;
+      font-size: 0.9rem;
+      max-width: 250px;
+    }
+    
+    ul {
+      margin-left: 1.5rem;
+      color: #b8c1cc;
+    }
+    
+    li {
+      margin: 0.5rem 0;
+    }
+    
+    strong {
+      color: #ffd166;
+    }
+    
+    /* Loading state */
+    .loading {
+      text-align: center;
+      color: #8a95a5;
+      padding: 2rem;
+    }
   </style>
 </head>
 <body>
-
-  <!-- Navigation Dots -->
-  <div class="nav-dots" aria-hidden>
-    <div class="dot active" data-target="hero"><span class="dot-label">Intro</span></div>
-    <div class="dot" data-target="chaos"><span class="dot-label">Classical Chaos</span></div>
-    <div class="dot" data-target="trapped"><span class="dot-label">Trapped Ions</span></div>
-    <div class="dot" data-target="scarring"><span class="dot-label">Quantum Scars</span></div>
-    <div class="dot" data-target="interactive"><span class="dot-label">Play</span></div>
-    <div class="dot" data-target="refs"><span class="dot-label">References</span></div>
+  <div class="progress-bar" id="progressBar"></div>
+  
+  <div class="nav-dots">
+    <div class="nav-dot active" data-section="0"></div>
+    <div class="nav-dot" data-section="1"></div>
+    <div class="nav-dot" data-section="2"></div>
+    <div class="nav-dot" data-section="3"></div>
+    <div class="nav-dot" data-section="4"></div>
+    <div class="nav-dot" data-section="5"></div>
   </div>
 
-  <!-- Back to top with progress ring -->
-  <button id="backTop" class="back-top" title="Back to top" aria-label="Back to top">
-    <svg viewBox="0 0 36 36">
-      <path id="progress" d="M18 2.5 a 15.5 15.5 0 1 1 0 31 a 15.5 15.5 0 1 1 0 -31" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"></path>
-      <path id="progressActive" d="M18 2.5 a 15.5 15.5 0 1 1 0 31 a 15.5 15.5 0 1 1 0 -31" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round" stroke-dasharray="97.3" stroke-dashoffset="97.3"></path>
-      <defs>
-        <linearGradient id="g" x1="0" x2="1">
-          <stop offset="0%" stop-color="var(--accent)" />
-          <stop offset="100%" stop-color="var(--accent-2)" />
-        </linearGradient>
-      </defs>
-      <g transform="translate(9,12)"><text x="0" y="10" class="arrow" fill="var(--cream)" font-size="7">↑</text></g>
-    </svg>
-  </button>
-
-  <!-- HERO -->
-  <section id="hero">
-    <div class="hero-bg" aria-hidden></div>
-    <div class="hero-overlay" aria-hidden></div>
-    <div class="hero-inner">
-      <h1 class="hero-title">Quantum Scarring</h1>
-      <p class="lead">Where classical chaos leaves fingerprints on quantum systems — a short tour from intuition to applications in quantum hardware.</p>
-      <div class="cta-row">
-        <a class="btn" href="#chaos">Start with Chaos</a>
-        <a class="btn ghost" href="#interactive">Try an Interactive</a>
+  <!-- Hero -->
+  <section id="hero" class="visible">
+    <div class="container hero-content">
+      <h1>Quantum Scarring</h1>
+      <p class="subtitle">Where Classical Chaos Leaves Its Mark on the Quantum World</p>
+      <p style="max-width: 700px; margin: 0 auto 2rem;">In classical physics, chaos means unpredictability. In quantum mechanics, we expect smooth probability distributions. But quantum scars are something entirely unexpected: ghosts of classical order haunting quantum chaos.</p>
+      <div>
+        <a href="#chaos" class="btn">Start the Journey</a>
+        <a href="#applications" class="btn btn-secondary">Why It Matters</a>
       </div>
     </div>
-    <!-- decorative particles container (kept) -->
-    <div id="hero-particles" style="position:absolute;inset:0;pointer-events:none;z-index:0"></div>
   </section>
 
-  <!-- CHAOS: interactive canvas with expanded explanation -->
+  <!-- Classical Chaos -->
   <section id="chaos">
-    <h2 class="section-title fade">The Chaos Beneath</h2>
+    <div class="container">
+      <h2>Step 1: Understanding Classical Chaos</h2>
+      
+      <p>Before we dive into quantum scars, we need to understand chaos. Chaos doesn't mean "random" - it means <strong>extremely sensitive to initial conditions</strong>.</p>
+      
+      <div class="highlight">
+        <p><strong>The Butterfly Effect:</strong> Two particles starting almost identically can end up in completely different places. This is what makes weather prediction so hard!</p>
+      </div>
 
-    <div class="explain fade" style="margin-bottom:14px">
-      <h4>What is chaos?</h4>
-      <p>Chaos means extreme sensitivity to initial conditions. In a chaotic system, two nearly-identical initial states diverge exponentially fast. Examples: the double pendulum, weather, and billiard trajectories in irregular shapes.</p>
-      <div class="klist">
-        <p><strong>Key ideas:</strong></p>
+      <div class="canvas-container">
+        <canvas id="chaosCanvas"></canvas>
+        <div class="instructions">
+          <strong>Try it:</strong> Click anywhere to launch particles. Watch how they quickly diverge!
+        </div>
+      </div>
+      
+      <div class="controls">
+        <button class="btn" onclick="resetChaos()">Reset</button>
+        <button class="btn btn-secondary" onclick="toggleChaos()">Pause/Play</button>
+      </div>
+
+      <div class="info-card">
+        <h3>What You're Seeing</h3>
+        <p>Three particles launched from nearly the same point. In a chaotic system like this stadium billiard, they bounce off walls unpredictably. Notice how they spread apart exponentially fast - this is chaos in action.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quantum Expectations -->
+  <section id="quantum">
+    <div class="container">
+      <h2>Step 2: What We Expected in Quantum Systems</h2>
+      
+      <p>When physicists first studied the quantum version of chaotic systems, they had a clear expectation:</p>
+      
+      <div class="highlight">
+        <p><strong>Expected result:</strong> Quantum particles should spread out uniformly, creating a smooth "sea" of probability. The chaos should erase any special structures.</p>
+      </div>
+
+      <div class="canvas-container">
+        <canvas id="expectedCanvas"></canvas>
+      </div>
+
+      <div class="info-card">
+        <h3>The Uniform Distribution</h3>
+        <p>This is what physicists expected: a uniform probability distribution where the quantum particle is equally likely to be found anywhere in the system. No special patterns, no preferred locations - just smooth quantum chaos.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Discovery -->
+  <section id="discovery">
+    <div class="container">
+      <h2>Step 3: The Shocking Discovery</h2>
+      
+      <p>But in 1984, physicist Eric Heller made a stunning discovery...</p>
+      
+      <div class="highlight">
+        <p><strong>What he found:</strong> Some quantum states showed intense probability along specific paths - the exact paths of unstable classical orbits. These became known as <strong>quantum scars</strong>.</p>
+      </div>
+
+      <div class="canvas-container">
+        <canvas id="scarCanvas"></canvas>
+      </div>
+      
+      <div class="controls">
+        <button class="btn" onclick="changeScar()">Show Different Scar</button>
+        <button class="btn btn-secondary" onclick="toggleScarOverlay()">Toggle Classical Path</button>
+      </div>
+
+      <div class="info-card">
+        <h3>Quantum Scars Revealed</h3>
+        <p>The bright regions show where the quantum particle has high probability of being found. Notice how it follows a specific path - a "scar" left by a classical periodic orbit. It's as if the quantum particle "remembers" classical physics!</p>
         <ul>
-          <li><strong>Deterministic but unpredictable</strong> — the equations are deterministic but tiny uncertainties blow up.</li>
-          <li><strong>Lyapunov exponent</strong> — a number that measures how fast nearby trajectories separate.</li>
-          <li><strong>Unstable periodic orbits</strong> — special paths that the system visits transiently; they play a big role in scarring.</li>
+          <li>The scar follows an unstable classical orbit</li>
+          <li>It's not where the particle IS, but where it's most likely to be found</li>
+          <li>Multiple quantum states can share similar scar patterns</li>
         </ul>
       </div>
     </div>
-
-    <p class="content fade" style="margin-top:12px">Click the canvas to inject particle groups and watch their trajectories. These trails give an intuition for how chaotic scattering and repeated boundary interactions amplify small differences.</p>
-
-    <div class="visualization-container fade" style="height:480px">
-      <div class="canvas-wrap">
-        <canvas id="chaosCanvas" style="width:100%;height:100%;display:block;border-radius:8px"></canvas>
-      </div>
-    </div>
-    <div class="vis-controls fade">
-      <button class="btn" onclick="toggleChaos()">Toggle Chaos</button>
-      <button class="btn ghost" onclick="resetChaos()">Reset</button>
-      <span style="color:var(--muted);font-size:13px">Tip: click the canvas to spawn particle groups (warm-yellow / cyan / orange). Trails show divergence.</span>
-    </div>
   </section>
 
-  <!-- TRAPPED IONS (expanded explanation) -->
-  <section id="trapped">
-    <h2 class="section-title fade">Trapped Ions: Quantum Billiards</h2>
-
-    <div class="explain fade" style="margin-bottom:14px">
-      <h4>Why traps are billiards</h4>
-      <p>Electromagnetic traps confine ions to small regions where their motion is strongly influenced by the trap geometry. Classically that's like a billiard table—the shape and boundary conditions determine trajectories. Quantum mechanically, the allowed wavefunctions (eigenstates) and energies depend on that same geometry.</p>
-      <p>By engineering trap shape and surface properties, experimentalists can influence decoherence and mode structure — a lever for improving qubit performance.</p>
-    </div>
-
-    <div class="visualization-container fade">
-      <div style="display:flex;align-items:center;justify-content:center;height:100%">
-        <img src="https://images.unsplash.com/photo-1581093588401-8b46a3f5d4a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1800&q=80" alt="ion trap" style="max-height:100%;max-width:100%;object-fit:cover;filter:brightness(0.78)">
-      </div>
-    </div>
-  </section>
-
-  <!-- SCARRING: expanded explanation -->
-  <section id="scarring">
-    <h2 class="section-title fade">Quantum Scarring — Ghosts of Classical Orbits</h2>
-
-    <div class="explain fade" style="margin-bottom:14px">
-      <h4>What are quantum scars?</h4>
-      <p>When a classical system is chaotic you might expect the corresponding quantum eigenfunctions to be evenly spread. Instead, some eigenfunctions display enhanced probability density along unstable classical periodic orbits — these features are called <em>scars</em>.</p>
-      <h4>How do scars arise (short)</h4>
-      <p>Intuitively, even though individual classical trajectories diverge, families of trajectories near an unstable periodic orbit interfere constructively in the quantum amplitude along the orbit. Semiclassically this is tied to contributions from periodic orbits in trace formulas.</p>
-      <h4>Why they matter</h4>
-      <ul>
-        <li>Scars concentrate energy or probability, which can change transition rates and coupling to the environment.</li>
-        <li>In ion traps or cavities, engineered scarring could localize excitations and reduce heating or decoherence.</li>
-        <li>Many-body scars (a related phenomenon) can slow thermalization and enable long-lived nonthermal states.</li>
-      </ul>
-    </div>
-
-    <p class="content fade">Use the visualization below to cycle through interference-style patterns that mimic scar-like features. These are illustrative, not literal quantum eigenfunctions — but they capture the idea of concentrated probability along structures.</p>
-
-    <div class="visualization-container fade" style="height:480px">
-      <div class="canvas-wrap">
-        <canvas id="scarCanvas" style="width:100%;height:100%;display:block;border-radius:8px"></canvas>
-      </div>
-    </div>
-    <div class="vis-controls fade">
-      <button class="btn" onclick="changeScarPattern()">Change Pattern</button>
-      <span style="color:var(--muted);font-size:13px">Try different patterns to see ring-like or orbit-like interference; these are stylized visual aids.</span>
-    </div>
-  </section>
-
-  <!-- INTERACTIVE: double pendulum with trails and speed control -->
-  <section id="interactive">
-    <h2 class="section-title fade">Interactive: Double Pendulum (Butterfly Effect)</h2>
-    <p class="content fade">This simulation now runs faster and shows trails for the two nearby initial conditions. Increase the <strong>speed</strong> to make divergence obvious and increase <strong>trail length</strong> to see the butterfly-like wings.</p>
-
-    <div class="visualization-container" style="height:520px">
-      <div style="display:flex;height:100%">
-        <!-- Left: canvas -->
-        <div style="flex:1;display:flex;flex-direction:column;padding:14px">
-          <canvas id="dpCanvas" style="flex:1;border-radius:8px;background:linear-gradient(180deg, rgba(3,6,12,0.6), rgba(6,12,20,0.8));border:1px solid rgba(255,255,255,0.03);"></canvas>
-          <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
-            <button id="playBtn" class="btn">Play</button>
-            <button id="resetBtn" class="btn ghost">Reset</button>
-            <label style="font-size:13px">Speed <input id="speed" type="range" min="0.2" max="5" step="0.1" value="2.5"></label>
-            <label style="font-size:13px">Trail <input id="trailLen" type="range" min="20" max="800" step="10" value="300"></label>
-            <label style="margin-left:8px;font-size:13px">θ1 <input id="a1" type="range" min="-3.14" max="3.14" step="0.001" value="1.0"></label>
-            <label>θ2 <input id="a2" type="range" min="-3.14" max="3.14" step="0.001" value="1.05"></label>
-          </div>
+  <!-- Why It Happens -->
+  <section id="explanation">
+    <div class="container">
+      <h2>Step 4: Why Do Quantum Scars Exist?</h2>
+      
+      <p>Quantum scars arise from a beautiful interplay between classical and quantum mechanics:</p>
+      
+      <div class="two-column">
+        <div class="info-card">
+          <h3>Classical Picture</h3>
+          <p>Even in chaos, there are special <strong>periodic orbits</strong> - closed paths that a particle can follow. These orbits are unstable (small deviations grow), but they exist.</p>
         </div>
-
-        <!-- Right: explanation -->
-        <div style="width:360px;padding:18px;display:flex;flex-direction:column;gap:10px;align-items:start;justify-content:center">
-          <div style="background:var(--glass);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)">
-            <strong>Tip</strong>: set θ1 and θ2 almost identical, hit Play and increase Speed. Trails will show how two trajectories separate like butterfly wings.
-          </div>
-          <div style="background:var(--glass);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)">
-            <strong>Physics</strong>: the double pendulum is chaotic — small differences in initial angles produce large differences in state over time. This illustrates the classical side of the story behind scarring.
-          </div>
+        
+        <div class="info-card">
+          <h3>Quantum Interference</h3>
+          <p>Quantum particles are waves. When many quantum paths pass near a classical periodic orbit, they can <strong>interfere constructively</strong>, creating enhanced probability along that orbit.</p>
         </div>
       </div>
+
+      <div class="highlight">
+        <p><strong>The Key Insight:</strong> Scars are quantum interference patterns organized by classical periodic orbits. They're a bridge between classical and quantum worlds - classical structure surviving in quantum mechanics.</p>
+      </div>
+
+      <div class="info-card">
+        <h3>A Simple Analogy</h3>
+        <p>Imagine a crowded train station (chaos). While individual people move randomly, certain paths (to exits, platforms) naturally concentrate more people. Quantum scars are like those well-worn paths - they emerge from the underlying structure despite the apparent chaos.</p>
+      </div>
     </div>
   </section>
 
-  <!-- REFERENCES -->
-  <section id="refs">
-    <h2 class="section-title fade">References & Further Reading</h2>
-    <div class="content fade refs">
-      <div class="ref-item"><strong>Heller (1984)</strong>: E. J. Heller, "Bound-State Eigenfunctions of Classically Chaotic Hamiltonian Systems: Scars of Periodic Orbits." <a href="https://link.aps.org/doi/10.1103/PhysRevLett.53.1515" target="_blank" rel="noopener" style="color:var(--accent)">Phys. Rev. Lett. (1984)</a></div>
-      <div class="ref-item"><strong>Review — Many-body scars</strong>: A pedagogical review on quantum many-body scars and connections: <a href="https://arxiv.org/abs/2109.00548" target="_blank" rel="noopener" style="color:var(--accent)">arXiv:2109.00548</a></div>
-      <div class="ref-item"><strong>Double Pendulum — build/visualize</strong>: A hands-on tutorial for building a double pendulum visualization. <a href="https://www.instructables.com/Visualizing-Chaos-With-the-Double-Pendulum/" target="_blank" rel="noopener" style="color:var(--accent)">Instructables</a></div>
-      <div class="ref-item"><strong>Quantum chaos in billiards — figures & visualizations</strong>: see surveys and figure collections (search "quantum chaos billiards" or check semantic scholar figure galleries).</div>
+  <!-- Applications -->
+  <section id="applications">
+    <div class="container">
+      <h2>Step 5: Why Quantum Scars Matter</h2>
+      
+      <p>Quantum scars aren't just a curiosity - they have real implications for cutting-edge technology:</p>
+
+      <div class="info-card">
+        <h3>1. Quantum Computing</h3>
+        <p><strong>The Problem:</strong> Quantum computers need to maintain delicate quantum states, but environmental noise causes "decoherence" - the information gets scrambled.</p>
+        <p><strong>The Opportunity:</strong> Quantum scars represent localized, persistent quantum states. If we can engineer systems with the right scars, we might "trap" quantum information in these stable patterns, protecting it from decoherence.</p>
+      </div>
+
+      <div class="info-card">
+        <h3>2. Many-Body Quantum Scars</h3>
+        <p><strong>Recent Discovery:</strong> In 2018, researchers found "many-body scars" in systems with many interacting particles.</p>
+        <p><strong>Why It's Exciting:</strong> These scars prevent thermalization - the system doesn't reach thermal equilibrium as expected. This could enable long-lived quantum states for quantum memory and simulation.</p>
+      </div>
+
+      <div class="info-card">
+        <h3>3. Trapped Ion Quantum Hardware</h3>
+        <p><strong>The Connection:</strong> Ions trapped in electromagnetic fields behave like particles in quantum billiards - exactly the systems where scars appear!</p>
+        <p><strong>The Application:</strong> By engineering trap geometries, we can control which scars appear, potentially improving qubit coherence times and gate fidelities.</p>
+      </div>
+
+      <div class="highlight">
+        <p><strong>The Frontier:</strong> We're still discovering what quantum scars can do. This is a young field where fundamental physics meets practical quantum technology. Your expertise could help unlock their potential.</p>
+      </div>
     </div>
   </section>
 
-  <!-- CTA -->
+  <!-- Call to Action -->
   <section id="cta">
-    <h2 class="section-title fade">Get Involved</h2>
-    <p class="content fade">If you want, I can: (1) tailor this page for your lab branding, (2) swap in high-res images (I can suggest specific Unsplash/Creative Commons options), (3) add a billiard interactive instead of the double pendulum.</p>
-    <div style="margin-top:18px"><a class="btn" href="#hero">Back to top</a></div>
-  </section>
+    <div class="container">
+      <h2>This Is Where You Come In</h2>
+      
+      <p style="text-align: center; font-size: 1.2rem; margin-bottom: 2rem;">Quantum scarring is a rapidly evolving field that needs diverse expertise:</p>
 
-  <footer style="padding:28px;text-align:center;background:transparent;border-top:1px solid rgba(255,255,255,0.03)">Quantum Scarring Research • © <span id="yr"></span></footer>
+      <div class="two-column">
+        <div class="info-card">
+          <h3>🔬 Experimental Physicists</h3>
+          <p>Design trap geometries, measure scar properties, validate theoretical predictions in real quantum systems.</p>
+        </div>
+        
+        <div class="info-card">
+          <h3>💻 Computational Scientists</h3>
+          <p>Simulate large quantum systems, identify scar patterns, optimize geometries for desired scar properties.</p>
+        </div>
+        
+        <div class="info-card">
+          <h3>📐 Theoretical Physicists</h3>
+          <p>Develop semiclassical theories, predict new scar phenomena, connect to broader questions in quantum chaos.</p>
+        </div>
+        
+        <div class="info-card">
+          <h3>⚙️ Quantum Engineers</h3>
+          <p>Implement scar-based designs in real quantum hardware, integrate with existing quantum computing architectures.</p>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 3rem;">
+        <h3>Key Resources</h3>
+        <p style="margin-bottom: 1rem;">Start your journey into quantum scarring:</p>
+        <div class="controls">
+          <a href="https://link.aps.org/doi/10.1103/PhysRevLett.53.1515" target="_blank" class="btn">Heller's Original Paper (1984)</a>
+          <a href="https://arxiv.org/abs/2109.00548" target="_blank" class="btn btn-secondary">Many-Body Scars Review</a>
+        </div>
+      </div>
+
+      <div class="highlight" style="margin-top: 3rem; text-align: center;">
+        <p><strong>What will we discover next?</strong></p>
+        <p>The story of quantum scars is still being written. Every breakthrough brings new questions, new possibilities, and new opportunities for innovation. The next chapter could be yours.</p>
+      </div>
+    </div>
+  </section>
 
   <script>
-    // small helpers
-    document.getElementById('yr').textContent = new Date().getFullYear();
+    // Progress bar
+    function updateProgress() {
+      const scroll = window.scrollY;
+      const height = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scroll / height) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+    }
 
-    // Fade-in observer
-    const faders = document.querySelectorAll('.fade');
-    const obs = new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); })
-    }, {threshold: 0.12});
-    faders.forEach(f=>obs.observe(f));
+    window.addEventListener('scroll', updateProgress);
 
-    // Navigation dots
-    const dots = document.querySelectorAll('.nav-dots .dot');
+    // Section visibility on scroll
     const sections = document.querySelectorAll('section');
-    dots.forEach(dot=>dot.addEventListener('click', ()=>{
-      const id = dot.dataset.target; document.getElementById(id).scrollIntoView({behavior:'smooth'});
-    }));
+    const observerOptions = {
+      threshold: 0.2,
+      rootMargin: '0px'
+    };
 
-    // Update active dot on scroll (center of viewport)
-    function updateActiveDot(){
-      const mid = window.scrollY + window.innerHeight/2;
-      let current = sections[0].id;
-      sections.forEach(s=>{ const top=s.offsetTop; const h=s.clientHeight; if(mid>=top && mid<top+h) current = s.id; });
-      dots.forEach(d=> d.classList.toggle('active', d.dataset.target===current));
-    }
-    window.addEventListener('scroll', updateActiveDot, {passive:true});
-    updateActiveDot();
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          
+          // Update nav dots
+          const index = Array.from(sections).indexOf(entry.target);
+          document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+          });
+        }
+      });
+    }, observerOptions);
 
-    // Back to top + progress
-    const backTop = document.getElementById('backTop');
-    const progressActive = document.getElementById('progressActive');
-    const totalLen = progressActive.getTotalLength();
-    progressActive.style.strokeDasharray = totalLen;
-    function updateProgress(){
-      const scrollTop = window.scrollY; const docH = document.body.scrollHeight - window.innerHeight;
-      const pct = docH>0 ? Math.min(1, scrollTop/docH) : 0;
-      const dash = totalLen * (1 - pct);
-      progressActive.style.strokeDashoffset = dash;
-      backTop.classList.toggle('visible', scrollTop>window.innerHeight*0.03);
-    }
-    window.addEventListener('scroll', updateProgress, {passive:true});
-    backTop.addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
-    updateProgress();
+    sections.forEach(section => observer.observe(section));
 
-    // Particles for hero (simple DOM dots)
-    function createParticles(containerId, count = 80) {
-      const container = document.getElementById(containerId);
-      if(!container) return;
-      container.innerHTML = '';
-      const colors = ['var(--accent)', '#00d4ff', '#ff6b35'];
-      for (let i = 0; i < count; i++) {
-        const particle = document.createElement('div');
-        const size = Math.random() * 4 + 1;
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        particle.style.position = 'absolute';
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
-        particle.style.backgroundColor = color;
-        particle.style.borderRadius = '50%';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.top = Math.random() * 100 + '%';
-        particle.style.opacity = Math.random() * 0.5 + 0.15;
-        particle.style.boxShadow = `0 0 ${size * 3}px ${size}px ${color.replace('var(--accent)','rgba(255,209,102,0.4)')}`;
-        container.appendChild(particle);
-        animateParticle(particle, i % 3);
-      }
-    }
-    function animateParticle(particle, type) {
-      const duration = Math.random() * 20 + 10;
-      let keyframes;
-      if (type === 0) keyframes = [{ transform: 'translate(0, 0)' }, { transform: `translate(${Math.random() * 100 - 50}px, 0)` }];
-      else if (type === 1) keyframes = [{ transform: 'translate(0, 0)' }, { transform: `translate(0, ${Math.random() * 100 - 50}px)` }];
-      else keyframes = [{ transform: 'translate(0, 0)' }, { transform: `translate(${Math.random() * 80 - 40}px, ${Math.random() * 80 - 40}px)` }];
-      particle.animate(keyframes, { duration: duration * 1000, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out' });
-    }
+    // Nav dot click handlers
+    document.querySelectorAll('.nav-dot').forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        sections[index].scrollIntoView({ behavior: 'smooth' });
+      });
+    });
 
-    // ----------------------- Chaos simulation (user provided script) -----------------------
-    let chaosParticles = [];
-    let chaosAnimating = true;
-    let chaosLoopId = null;
+    // === CHAOS CANVAS ===
     const chaosCanvas = document.getElementById('chaosCanvas');
-    const chaosCtx = chaosCanvas ? chaosCanvas.getContext('2d') : null;
+    const chaosCtx = chaosCanvas.getContext('2d');
+    let chaosParticles = [];
+    let chaosRunning = true;
+    let chaosAnimationId;
 
-    function initChaosCanvas() {
-      if(!chaosCanvas) return;
-      const rect = chaosCanvas.getBoundingClientRect();
-      const DPR = window.devicePixelRatio || 1;
-      chaosCanvas.width = Math.max(300, rect.width * DPR);
-      chaosCanvas.height = Math.max(200, rect.height * DPR);
-      chaosCanvas.style.width = rect.width + 'px';
-      chaosCanvas.style.height = rect.height + 'px';
-      if(chaosCtx) chaosCtx.setTransform(DPR,0,0,DPR,0,0);
-      // clear background
-      if(chaosCtx){ chaosCtx.fillStyle = 'rgba(5,8,15,1)'; chaosCtx.fillRect(0,0,chaosCanvas.width/DPR,chaosCanvas.height/DPR); }
+    function resizeChaos() {
+      const container = chaosCanvas.parentElement;
+      const dpr = window.devicePixelRatio || 1;
+      chaosCanvas.width = container.clientWidth * dpr;
+      chaosCanvas.height = container.clientHeight * dpr;
+      chaosCanvas.style.width = container.clientWidth + 'px';
+      chaosCanvas.style.height = container.clientHeight + 'px';
+      chaosCtx.scale(dpr, dpr);
     }
 
-    class ChaosParticle {
-      constructor(x, y, vx, vy, color) {
+    class Particle {
+      constructor(x, y, color) {
         this.x = x;
         this.y = y;
-        this.vx = vx;
-        this.vy = vy;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 3 + Math.random() * 2;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
         this.color = color;
         this.trail = [];
-        this.maxTrail = 50;
+        this.maxTrail = 80;
       }
+
       update() {
-        this.trail.push({x: this.x, y: this.y});
+        this.trail.push({ x: this.x, y: this.y });
         if (this.trail.length > this.maxTrail) this.trail.shift();
+
         this.x += this.vx;
         this.y += this.vy;
-        const w = chaosCanvas.width / (window.devicePixelRatio || 1);
-        const h = chaosCanvas.height / (window.devicePixelRatio || 1);
-        if (this.x < 0 || this.x > w) {
-          this.vx *= -1 * (0.95 + Math.random() * 0.1);
-          this.x = Math.max(0, Math.min(w, this.x));
+
+        const w = chaosCanvas.clientWidth;
+        const h = chaosCanvas.clientHeight;
+        const margin = 50;
+
+        // Stadium shape collision
+        if (this.x < margin || this.x > w - margin) {
+          this.vx *= -0.98;
+          this.x = Math.max(margin, Math.min(w - margin, this.x));
         }
-        if (this.y < 0 || this.y > h) {
-          this.vy *= -1 * (0.95 + Math.random() * 0.1);
-          this.y = Math.max(0, Math.min(h, this.y));
+        if (this.y < margin || this.y > h - margin) {
+          this.vy *= -0.98;
+          this.y = Math.max(margin, Math.min(h - margin, this.y));
         }
+
+        // Add slight chaos
+        this.vx += (Math.random() - 0.5) * 0.1;
+        this.vy += (Math.random() - 0.5) * 0.1;
       }
+
       draw() {
-        if(!chaosCtx) return;
         // Draw trail
+        chaosCtx.strokeStyle = this.color;
+        chaosCtx.lineWidth = 1.5;
+        chaosCtx.globalAlpha = 0.6;
+        chaosCtx.beginPath();
         for (let i = 0; i < this.trail.length - 1; i++) {
-          const alpha = i / this.trail.length;
-          // build rgba
-          const c = hexToRgb(this.color);
-          chaosCtx.strokeStyle = `rgba(${c.r},${c.g},${c.b},${alpha})`;
-          chaosCtx.lineWidth = 2;
-          chaosCtx.beginPath();
           chaosCtx.moveTo(this.trail[i].x, this.trail[i].y);
-          chaosCtx.lineTo(this.trail[i+1].x, this.trail[i+1].y);
-          chaosCtx.stroke();
+          chaosCtx.lineTo(this.trail[i + 1].x, this.trail[i + 1].y);
         }
+        chaosCtx.stroke();
+
         // Draw particle
+        chaosCtx.globalAlpha = 1;
         chaosCtx.fillStyle = this.color;
         chaosCtx.beginPath();
-        chaosCtx.arc(this.x, this.y, 5, 0, Math.PI * 2);
+        chaosCtx.arc(this.x, this.y, 4, 0, Math.PI * 2);
         chaosCtx.fill();
       }
     }
 
     function animateChaos() {
-      if (!chaosAnimating || !chaosCtx) { chaosLoopId = null; return; }
-      const w = chaosCanvas.width / (window.devicePixelRatio || 1);
-      const h = chaosCanvas.height / (window.devicePixelRatio || 1);
-      chaosCtx.fillStyle = 'rgba(5,8,15,0.12)';
+      if (!chaosRunning) {
+        chaosAnimationId = null;
+        return;
+      }
+
+      const w = chaosCanvas.clientWidth;
+      const h = chaosCanvas.clientHeight;
+
+      chaosCtx.fillStyle = 'rgba(19, 24, 32, 0.1)';
       chaosCtx.fillRect(0, 0, w, h);
-      chaosParticles.forEach(p => { p.update(); p.draw(); });
-      chaosLoopId = requestAnimationFrame(animateChaos);
+
+      chaosParticles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+
+      chaosAnimationId = requestAnimationFrame(animateChaos);
     }
 
-    chaosCanvas && chaosCanvas.addEventListener('click', (e) => {
+    chaosCanvas.addEventListener('click', (e) => {
       const rect = chaosCanvas.getBoundingClientRect();
-      const DPR = window.devicePixelRatio || 1;
-      const x = (e.clientX - rect.left);
-      const y = (e.clientY - rect.top);
-      const colors = ['#ffd166', '#ff9f1c', '#00d4ff'];
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const colors = ['#ffd166', '#06ffa5', '#ff6b6b'];
       for (let i = 0; i < 3; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 3 + Math.random() * 2;
-        chaosParticles.push(new ChaosParticle(
-          x + i * 2, y + i * 2,
-          Math.cos(angle) * speed,
-          Math.sin(angle) * speed,
-          colors[i]
-        ));
+        chaosParticles.push(new Particle(x + i * 2, y + i * 2, colors[i]));
       }
-      if(!chaosLoopId){ chaosAnimating = true; animateChaos(); }
+      
+      if (!chaosAnimationId) {
+        chaosRunning = true;
+        animateChaos();
+      }
     });
 
     function resetChaos() {
       chaosParticles = [];
-      if(chaosCtx){ const w = chaosCanvas.width/(window.devicePixelRatio||1); const h = chaosCanvas.height/(window.devicePixelRatio||1); chaosCtx.fillStyle = 'rgba(5,8,15,1)'; chaosCtx.fillRect(0,0,w,h); }
+      chaosCtx.fillStyle = '#131820';
+      chaosCtx.fillRect(0, 0, chaosCanvas.clientWidth, chaosCanvas.clientHeight);
     }
 
-    function toggleChaos() { chaosAnimating = !chaosAnimating; if(chaosAnimating && !chaosLoopId) animateChaos(); }
+    function toggleChaos() {
+      chaosRunning = !chaosRunning;
+      if (chaosRunning && !chaosAnimationId) animateChaos();
+    }
 
-    // ----------------------- Scar canvas (user provided) -----------------------
+    // === EXPECTED QUANTUM CANVAS ===
+    const expectedCanvas = document.getElementById('expectedCanvas');
+    const expectedCtx = expectedCanvas.getContext('2d');
+
+    function resizeExpected() {
+      const container = expectedCanvas.parentElement;
+      const dpr = window.devicePixelRatio || 1;
+      expectedCanvas.width = container.clientWidth * dpr;
+      expectedCanvas.height = container.clientHeight * dpr;
+      expectedCanvas.style.width = container.clientWidth + 'px';
+      expectedCanvas.style.height = container.clientHeight + 'px';
+      expectedCtx.scale(dpr, dpr);
+      drawExpected();
+    }
+
+    function drawExpected() {
+      const w = expectedCanvas.clientWidth;
+      const h = expectedCanvas.clientHeight;
+      
+      // Create uniform noise pattern
+      const imageData = expectedCtx.createImageData(w, h);
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        const val = 100 + Math.random() * 50;
+        imageData.data[i] = val * 0.4;
+        imageData.data[i + 1] = val * 0.6;
+        imageData.data[i + 2] = val;
+        imageData.data[i + 3] = 255;
+      }
+      expectedCtx.putImageData(imageData, 0, 0);
+      
+      // Add text
+      expectedCtx.fillStyle = 'rgba(255, 209, 102, 0.8)';
+      expectedCtx.font = 'bold 24px sans-serif';
+      expectedCtx.textAlign = 'center';
+      expectedCtx.fillText('Expected: Uniform Probability', w / 2, h / 2);
+    }
+
+    // === SCAR CANVAS ===
     const scarCanvas = document.getElementById('scarCanvas');
-    const scarCtx = scarCanvas ? scarCanvas.getContext('2d') : null;
+    const scarCtx = scarCanvas.getContext('2d');
     let scarPattern = 0;
+    let showOverlay = false;
 
-    function initScarCanvas() {
-      if(!scarCanvas) return;
-      const rect = scarCanvas.getBoundingClientRect();
-      const DPR = window.devicePixelRatio || 1;
-      scarCanvas.width = Math.max(300, rect.width * DPR);
-      scarCanvas.height = Math.max(200, rect.height * DPR);
-      scarCanvas.style.width = rect.width + 'px';
-      scarCanvas.style.height = rect.height + 'px';
-      if(scarCtx) scarCtx.setTransform(DPR,0,0,DPR,0,0);
+    function resizeScar() {
+      const container = scarCanvas.parentElement;
+      const dpr = window.devicePixelRatio || 1;
+      scarCanvas.width = container.clientWidth * dpr;
+      scarCanvas.height = container.clientHeight * dpr;
+      scarCanvas.style.width = container.clientWidth + 'px';
+      scarCanvas.style.height = container.clientHeight + 'px';
+      scarCtx.scale(dpr, dpr);
       drawScar();
     }
 
     function drawScar() {
-      if(!scarCtx) return;
-      const DPR = window.devicePixelRatio || 1;
-      const w = scarCanvas.width / DPR; const h = scarCanvas.height / DPR;
-      scarCtx.fillStyle = 'rgba(5,8,15,1)'; scarCtx.fillRect(0,0,w,h);
-      const imageData = scarCtx.createImageData(w, h);
-      const data = imageData.data;
-      for (let y = 0; y < h; y++){
-        for (let x = 0; x < w; x++){
-          const idx = (y * w + x) * 4;
-          const nx = (x / w - 0.5) * 4; const ny = (y / h - 0.5) * 4;
-          let intensity = 0;
-          if (scarPattern === 0) {
-            intensity = Math.cos(nx * 5) * Math.cos(ny * 5);
-            intensity += Math.cos(Math.sqrt(nx*nx + ny*ny) * 8) * 0.5;
-          } else if (scarPattern === 1) {
-            intensity = Math.cos(nx * 3 + ny * 3) * Math.cos(nx * 3 - ny * 3);
-            intensity += Math.exp(-(nx*nx + ny*ny) * 0.3) * 2;
-          } else {
-            const r = Math.sqrt(nx*nx + ny*ny);
-            const theta = Math.atan2(ny, nx);
-            intensity = Math.cos(r * 6 + theta * 4) * Math.cos(r * 4);
+      const w = scarCanvas.clientWidth;
+      const h = scarCanvas.clientHeight;
+      
+      // Background
+      scarCtx.fillStyle = '#131820';
+      scarCtx.fillRect(0, 0, w, h);
+      
+      // Create scar pattern
+      const centerX = w / 2;
+      const centerY = h / 2;
+      
+      if (scarPattern === 0) {
+        // Horizontal bowtie scar
+        drawScarPath(scarCtx, [
+          { x: centerX - 200, y: centerY },
+          { x: centerX - 100, y: centerY - 80 },
+          { x: centerX, y: centerY },
+          { x: centerX + 100, y: centerY + 80 },
+          { x: centerX + 200, y: centerY },
+          { x: centerX + 100, y: centerY - 80 },
+          { x: centerX, y: centerY },
+          { x: centerX - 100, y: centerY + 80 },
+          { x: centerX - 200, y: centerY }
+        ], '#ffd166');
+      } else if (scarPattern === 1) {
+        // Circular scar
+        for (let r = 80; r <= 180; r += 50) {
+          const points = [];
+          for (let angle = 0; angle < Math.PI * 2; angle += 0.1) {
+            points.push({
+              x: centerX + Math.cos(angle) * r,
+              y: centerY + Math.sin(angle) * r
+            });
           }
-          intensity = (intensity + 1) / 2; intensity = Math.pow(intensity, 1.5);
-          data[idx] = intensity * 255 * 0.4 + 40;
-          data[idx+1] = intensity * 180 + 40;
-          data[idx+2] = intensity * 255;
-          data[idx+3] = 255;
+          drawScarPath(scarCtx, points, '#ffd166');
         }
+      } else {
+        // Diamond scar
+        drawScarPath(scarCtx, [
+          { x: centerX, y: centerY - 200 },
+          { x: centerX + 150, y: centerY },
+          { x: centerX, y: centerY + 200 },
+          { x: centerX - 150, y: centerY },
+          { x: centerX, y: centerY - 200 }
+        ], '#ffd166');
       }
-      scarCtx.putImageData(imageData,0,0);
-      scarCtx.globalCompositeOperation = 'screen'; scarCtx.filter = 'blur(3px)'; scarCtx.drawImage(scarCanvas,0,0); scarCtx.filter='none'; scarCtx.globalCompositeOperation='source-over';
+      
+      // Classical orbit overlay
+      if (showOverlay) {
+        scarCtx.strokeStyle = 'rgba(255, 107, 107, 0.8)';
+        scarCtx.lineWidth = 3;
+        scarCtx.setLineDash([10, 5]);
+        if (scarPattern === 0) {
+          scarCtx.beginPath();
+          scarCtx.moveTo(centerX - 200, centerY);
+          scarCtx.lineTo(centerX + 200, centerY);
+          scarCtx.stroke();
+        }
+        scarCtx.setLineDash([]);
+      }
     }
 
-    function changeScarPattern(){ scarPattern = (scarPattern + 1) % 3; drawScar(); }
-
-    // utility: convert hex to rgb
-    function hexToRgb(hex){
-      if(hex.startsWith('#')) hex = hex.slice(1);
-      if(hex.length===3) hex = hex.split('').map(c=>c+c).join('');
-      const num = parseInt(hex,16);
-      return { r: (num>>16)&255, g:(num>>8)&255, b:num&255 };
+    function drawScarPath(ctx, points, color) {
+      // Draw glow
+      for (let size = 40; size > 0; size -= 5) {
+        ctx.strokeStyle = color + Math.floor((1 - size / 40) * 255).toString(16).padStart(2, '0');
+        ctx.lineWidth = size;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+          ctx.lineTo(points[i].x, points[i].y);
+        }
+        ctx.stroke();
+      }
+      
+      // Draw core line
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i].x, points[i].y);
+      }
+      ctx.stroke();
     }
 
-    // ----------------------- Double pendulum interactive (speed + trails) -----------------------
-    (function(){
-      const canvas = document.getElementById('dpCanvas');
-      if(!canvas) return;
-      const ctx = canvas.getContext('2d');
-      function resize(){ const rect = canvas.getBoundingClientRect(); const DPR = window.devicePixelRatio || 1; canvas.width = Math.max(300, rect.width * DPR); canvas.height = Math.max(200, rect.height * DPR); canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px'; ctx.setTransform(DPR,0,0,DPR,0,0); }
-      window.addEventListener('resize', resize); resize();
+    function changeScar() {
+      scarPattern = (scarPattern + 1) % 3;
+      drawScar();
+    }
 
-      // state: [theta1, theta2, omega1, omega2]
-      let stateA = [1.0,1.05,0,0];
-      let stateB = [1.002,1.052,0,0]; // slightly perturbed for divergence visualization
+    function toggleScarOverlay() {
+      showOverlay = !showOverlay;
+      drawScar();
+    }
 
-      // dynamic parameters
-      let simSpeed = 2.5; // multiplier for simulation speed (user can change)
-      let trailMax = 300;
-
-      // physics constants
-      const m1=1, m2=1;
-      let l1 = 160, l2 = 160; // drawing lengths (pixels) - updated each frame
-      let g = 20.0; // larger g -> faster oscillations (keeps equations stable)
-
-      let running=false; let last=performance.now();
-
-      const playBtn = document.getElementById('playBtn');
-      const resetBtn = document.getElementById('resetBtn');
-      const a1 = document.getElementById('a1');
-      const a2 = document.getElementById('a2');
-      const speedInput = document.getElementById('speed');
-      const trailInput = document.getElementById('trailLen');
-
-      // trails (store pixel positions)
-      let pathA = [];
-      let pathB = [];
-
-      function deriv(s){
-        const [t1,t2,w1,w2]=s;
-        const d = 2*m1 + m2 - m2*Math.cos(2*t1-2*t2);
-        const dw1 = (-g*(2*m1+m2)*Math.sin(t1) - m2*g*Math.sin(t1-2*t2) - 2*Math.sin(t1-t2)*m2*(w2*w2*l2 + w1*w1*l1*Math.cos(t1-t2)))/(l1*d);
-        const dw2 = (2*Math.sin(t1-t2)*(w1*w1*l1*(m1+m2) + g*(m1+m2)*Math.cos(t1) + w2*w2*l2*m2*Math.cos(t1-t2)))/(l2*d);
-        return [w1,w2,dw1,dw2];
-      }
-
-      function rk4(s,dt){
-        const k1 = deriv(s);
-        const s2 = s.map((v,i)=>v + k1[i]*dt/2);
-        const k2 = deriv(s2);
-        const s3 = s.map((v,i)=>v + k2[i]*dt/2);
-        const k3 = deriv(s3);
-        const s4 = s.map((v,i)=>v + k3[i]*dt);
-        const k4 = deriv(s4);
-        return s.map((v,i)=> v + dt*(k1[i]+2*k2[i]+2*k3[i]+k4[i])/6 );
-      }
-
-      function step(dt){
-        stateA = rk4(stateA,dt);
-        stateB = rk4(stateB,dt);
-      }
-
-      function draw(){
-        // clear with slight alpha so trails persist
-        ctx.fillStyle = 'rgba(3,6,12,0.18)';
-        ctx.fillRect(0,0,canvas.width,canvas.height);
-
-        const W = canvas.clientWidth, H = canvas.clientHeight;
-        // update drawing lengths proportional to canvas size for consistent feel
-        l1 = Math.min(W,H) * 0.22; l2 = Math.min(W,H) * 0.22;
-
-        ctx.save(); ctx.translate(W/2, H/3);
-
-        // compute pixel positions for both states and push to trail arrays
-        function xyFromState(s){ const [t1,t2] = s; const x1 = l1*Math.sin(t1), y1 = l1*Math.cos(t1); const x2 = x1 + l2*Math.sin(t2), y2 = y1 + l2*Math.cos(t2); return {x1,y1,x2,y2}; }
-        const pA = xyFromState(stateA); const pB = xyFromState(stateB);
-        pathA.push({x:pA.x2,y:pA.y2}); if(pathA.length>trailMax) pathA.shift();
-        pathB.push({x:pB.x2,y:pB.y2}); if(pathB.length>trailMax) pathB.shift();
-
-        // draw trails (B first, then A on top)
-        function drawTrail(path, color){
-          if(path.length<2) return;
-          ctx.lineWidth = 2;
-          for(let i=1;i<path.length;i++){
-            const a = i/path.length * 0.9; // alpha ramp
-            ctx.beginPath(); ctx.strokeStyle = `rgba(${color.r},${color.g},${color.b},${a})`;
-            ctx.moveTo(path[i-1].x, path[i-1].y); ctx.lineTo(path[i].x, path[i].y); ctx.stroke();
-          }
-        }
-        drawTrail(pathB, {r:255,g:151,b:59});
-        drawTrail(pathA, {r:255,g:209,b:102});
-
-        // draw pendulums
-        function drawState(s, color, alpha){ const [t1,t2] = s; const x1 = l1*Math.sin(t1), y1 = l1*Math.cos(t1); const x2 = x1 + l2*Math.sin(t2), y2 = y1 + l2*Math.cos(t2); ctx.beginPath(); ctx.lineWidth = 3; ctx.strokeStyle = color; ctx.globalAlpha = alpha; ctx.moveTo(0,0); ctx.lineTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.globalAlpha = alpha*0.95; ctx.beginPath(); ctx.arc(x1,y1,8,0,Math.PI*2); ctx.fillStyle=color; ctx.fill(); ctx.beginPath(); ctx.arc(x2,y2,7,0,Math.PI*2); ctx.fill(); }
-        drawState(stateB, 'rgba(255,151,59,0.85)', 0.95);
-        drawState(stateA, 'rgba(255,209,102,0.98)', 1.0);
-
-        ctx.restore();
-      }
-
-      function loop(t){
-        const rawDt = (t-last)/1000; last=t;
-        const dt = Math.min(0.04, rawDt) * simSpeed; // scale by simSpeed
-        if(running){
-          // sub-step to keep integrator stable
-          const steps = Math.max(1, Math.ceil(dt / 0.006));
-          const small = dt / steps;
-          for(let i=0;i<steps;i++) step(small);
-        }
-        draw(); requestAnimationFrame(loop);
-      }
-      requestAnimationFrame(loop);
-
-      playBtn.addEventListener('click', ()=>{ running = !running; playBtn.textContent = running ? 'Pause' : 'Play'; });
-      resetBtn.addEventListener('click', ()=>{ stateA=[parseFloat(a1.value),parseFloat(a2.value),0,0]; stateB=[parseFloat(a1.value)+0.0005,parseFloat(a2.value)+0.0005,0,0]; running=false; playBtn.textContent='Play'; pathA=[]; pathB=[]; });
-      a1.addEventListener('input', ()=>{ stateA[0]=parseFloat(a1.value); stateB[0]=parseFloat(a1.value)+0.0005; pathA=[]; pathB=[]; });
-      a2.addEventListener('input', ()=>{ stateA[1]=parseFloat(a2.value); stateB[1]=parseFloat(a2.value)+0.0005; pathA=[]; pathB=[]; });
-      speedInput.addEventListener('input', ()=>{ simSpeed = parseFloat(speedInput.value); });
-      trailInput.addEventListener('input', ()=>{ trailMax = parseInt(trailInput.value,10); if(pathA.length>trailMax) pathA = pathA.slice(-trailMax); if(pathB.length>trailMax) pathB = pathB.slice(-trailMax); });
-    })();
-
-    // Accessibility: keyboard shortcut 'T' to toggle top
-    window.addEventListener('keydown', (e)=>{ if(e.key.toLowerCase()==='t') window.scrollTo({top:0,behavior:'smooth'}); });
-
-    // Init on DOMContentLoaded
-    window.addEventListener('DOMContentLoaded', ()=>{
-      createParticles('hero-particles', 80);
-      initChaosCanvas(); initScarCanvas();
-      // start chaos loop if there are particles initially
-      if(chaosAnimating && !chaosLoopId) animateChaos();
+    // Initialize all canvases
+    window.addEventListener('load', () => {
+      resizeChaos();
+      resizeExpected();
+      resizeScar();
+      animateChaos();
     });
 
-    // resize handling
-    window.addEventListener('resize', ()=>{ initChaosCanvas(); initScarCanvas(); });
+    window.addEventListener('resize', () => {
+      resizeChaos();
+      resizeExpected();
+      resizeScar();
+    });
   </script>
-
-  <!-- GitHub Pages HOWTO (console message) -->
-  <script>console.log('
---- GitHub Pages quick HOWTO ---
-1) Create a public repo named: YOURUSERNAME.github.io
-2) Add this file as index.html in the repo root and commit+push to main (or default branch).
-3) Visit https://YOURUSERNAME.github.io in ~1-5 minutes.
-4) If you already have a repo, enable Pages in Settings -> Pages, choose the branch and folder (root).
-
-Need git commands? Ask and I will paste them.');</script>
 </body>
 </html>

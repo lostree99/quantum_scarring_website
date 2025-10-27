@@ -4,13 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quantum Scarring: Where Classical Chaos Meets Quantum Order</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #6a11cb;
-            --secondary: #2575fc;
-            --accent: #00cdac;
-            --dark: #121212;
-            --light: #f8f9fa;
+            --primary: #7e22ce;
+            --primary-light: #a855f7;
+            --secondary: #06b6d4;
+            --accent: #10b981;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f1f5f9;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
         }
         
         * {
@@ -20,8 +24,13 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+        }
+        
         body {
-            background-color: var(--dark);
+            background-color: var(--darker);
             color: var(--light);
             overflow-x: hidden;
         }
@@ -35,36 +44,57 @@
             align-items: center;
             position: relative;
             overflow: hidden;
+            scroll-snap-align: start;
+            transition: all 0.8s ease;
+        }
+        
+        .section-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            z-index: 0;
         }
         
         .section-title {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 2rem;
             text-align: center;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
+            background: var(--gradient);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             position: relative;
             z-index: 10;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
         .content {
             max-width: 1000px;
-            font-size: 1.2rem;
-            line-height: 1.6;
+            font-size: 1.3rem;
+            line-height: 1.7;
             text-align: center;
             position: relative;
             z-index: 10;
+            margin-bottom: 2rem;
         }
         
         .visualization-container {
             width: 100%;
             height: 400px;
             margin: 2rem 0;
-            border-radius: 10px;
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 10;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         /* Navigation */
@@ -77,83 +107,165 @@
         }
         
         .dot {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             background-color: rgba(255, 255, 255, 0.3);
-            margin: 1rem 0;
+            margin: 1.2rem 0;
             cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .dot::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: var(--gradient);
             transition: all 0.3s ease;
         }
         
+        .dot.active::after {
+            width: 20px;
+            height: 20px;
+        }
+        
         .dot.active {
-            background-color: var(--accent);
-            transform: scale(1.3);
+            background-color: transparent;
+        }
+        
+        .dot-label {
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(15, 23, 42, 0.8);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        
+        .dot:hover .dot-label {
+            opacity: 1;
         }
         
         /* Hero Section */
         #hero {
-            background: linear-gradient(135deg, var(--dark) 0%, #1a1a2e 100%);
+            background: linear-gradient(135deg, var(--darker) 0%, #1e1b4b 100%);
             text-align: center;
         }
         
+        #hero .section-bg {
+            background-image: url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+        }
+        
         .hero-title {
-            font-size: 4rem;
+            font-size: 5rem;
             margin-bottom: 1rem;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            background: var(--gradient);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
         
         .hero-subtitle {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             margin-bottom: 2rem;
-            opacity: 0.8;
+            opacity: 0.9;
+            max-width: 800px;
         }
         
         .cta-button {
             display: inline-block;
-            padding: 1rem 2rem;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            padding: 1.2rem 2.5rem;
+            background: var(--gradient);
             color: white;
             text-decoration: none;
             border-radius: 50px;
             font-weight: bold;
             margin-top: 2rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(126, 34, 206, 0.5);
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: all 0.6s ease;
         }
         
         .cta-button:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(106, 17, 203, 0.6);
+            box-shadow: 0 15px 30px rgba(126, 34, 206, 0.7);
+        }
+        
+        .cta-button:hover::before {
+            left: 100%;
         }
         
         /* Chaos Section */
         #chaos {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+        }
+        
+        #chaos .section-bg {
+            background-image: url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1974&q=80');
         }
         
         /* Trapped Ions Section */
         #trapped-ions {
-            background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+            background: linear-gradient(135deg, #312e81 0%, #4338ca 100%);
+        }
+        
+        #trapped-ions .section-bg {
+            background-image: url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
         }
         
         /* Scarring Section */
         #scarring {
-            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+            background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+        }
+        
+        #scarring .section-bg {
+            background-image: url('https://images.unsplash.com/photo-1502134249126-9f3755a50d78?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
         }
         
         /* Applications Section */
         #applications {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #3730a3 0%, #312e81 100%);
+        }
+        
+        #applications .section-bg {
+            background-image: url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
         }
         
         /* CTA Section */
         #cta {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             text-align: center;
+        }
+        
+        #cta .section-bg {
+            background-image: url('https://images.unsplash.com/photo-1502134249126-9f3755a50d78?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            opacity: 0.1;
         }
         
         .research-benefits {
@@ -167,19 +279,42 @@
         .benefit-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            padding: 2rem;
-            border-radius: 10px;
-            width: 250px;
-            transition: transform 0.3s ease;
+            padding: 2.5rem 1.5rem;
+            border-radius: 15px;
+            width: 280px;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .benefit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient);
         }
         
         .benefit-card:hover {
             transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
         }
         
         .benefit-icon {
-            font-size: 3rem;
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .benefit-card h3 {
             margin-bottom: 1rem;
+            font-size: 1.5rem;
         }
         
         /* Animation classes */
@@ -194,6 +329,28 @@
             transform: translateY(0);
         }
         
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .slide-in-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .slide-in-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
         /* Particle background */
         .particles {
             position: absolute;
@@ -203,21 +360,93 @@
             height: 100%;
             z-index: 1;
         }
+        
+        /* Visualization content */
+        .vis-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .vis-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .vis-text {
+            font-size: 1.2rem;
+            max-width: 600px;
+        }
+        
+        /* Footer */
+        footer {
+            padding: 2rem;
+            text-align: center;
+            background: var(--darker);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 3.5rem;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+            }
+            
+            .nav-dots {
+                right: 1rem;
+            }
+            
+            .research-benefits {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .benefit-card {
+                width: 100%;
+                max-width: 400px;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Navigation Dots -->
     <div class="nav-dots">
-        <div class="dot active" data-section="hero"></div>
-        <div class="dot" data-section="chaos"></div>
-        <div class="dot" data-section="trapped-ions"></div>
-        <div class="dot" data-section="scarring"></div>
-        <div class="dot" data-section="applications"></div>
-        <div class="dot" data-section="cta"></div>
+        <div class="dot active" data-section="hero">
+            <span class="dot-label">Introduction</span>
+        </div>
+        <div class="dot" data-section="chaos">
+            <span class="dot-label">Classical Chaos</span>
+        </div>
+        <div class="dot" data-section="trapped-ions">
+            <span class="dot-label">Trapped Ions</span>
+        </div>
+        <div class="dot" data-section="scarring">
+            <span class="dot-label">Quantum Scarring</span>
+        </div>
+        <div class="dot" data-section="applications">
+            <span class="dot-label">Applications</span>
+        </div>
+        <div class="dot" data-section="cta">
+            <span class="dot-label">Get Involved</span>
+        </div>
     </div>
 
     <!-- Hero Section -->
     <section id="hero">
+        <div class="section-bg"></div>
         <div class="particles" id="hero-particles"></div>
         <h1 class="hero-title fade-in">Quantum Scarring</h1>
         <p class="hero-subtitle fade-in">Where Classical Chaos Meets Quantum Order</p>
@@ -230,6 +459,7 @@
 
     <!-- Chaos Explained -->
     <section id="chaos">
+        <div class="section-bg"></div>
         <h2 class="section-title fade-in">The Chaos Beneath</h2>
         <div class="content fade-in">
             <p>
@@ -238,8 +468,12 @@
                 with trajectories that quickly become unpredictable.
             </p>
         </div>
-        <div class="visualization-container" id="chaos-visualization">
-            <!-- Chaos visualization will be inserted here by JavaScript -->
+        <div class="visualization-container">
+            <div class="vis-content">
+                <div class="vis-icon">🌪️</div>
+                <h3>Classical Chaos Visualization</h3>
+                <p class="vis-text">In chaotic systems, tiny differences in initial conditions lead to dramatically different outcomes. This sensitivity makes long-term prediction impossible, even in deterministic systems.</p>
+            </div>
         </div>
         <div class="content fade-in">
             <p>
@@ -251,6 +485,7 @@
 
     <!-- Trapped Ion Systems -->
     <section id="trapped-ions">
+        <div class="section-bg"></div>
         <h2 class="section-title fade-in">Trapped Ions: Quantum Billiards</h2>
         <div class="content fade-in">
             <p>
@@ -258,8 +493,12 @@
                 creating microscopic "billiard tables" where quantum particles bounce around.
             </p>
         </div>
-        <div class="visualization-container" id="ion-visualization">
-            <!-- Ion trap visualization will be inserted here by JavaScript -->
+        <div class="visualization-container">
+            <div class="vis-content">
+                <div class="vis-icon">⚛️</div>
+                <h3>Ion Trap System</h3>
+                <p class="vis-text">Ions are suspended in electromagnetic fields, creating perfect quantum systems for studying dynamics. By controlling trap geometry, we can engineer specific quantum behaviors.</p>
+            </div>
         </div>
         <div class="content fade-in">
             <p>
@@ -271,6 +510,7 @@
 
     <!-- Quantum Scarring -->
     <section id="scarring">
+        <div class="section-bg"></div>
         <h2 class="section-title fade-in">The Quantum Scar Mystery</h2>
         <div class="content fade-in">
             <p>
@@ -279,8 +519,12 @@
                 creating "scars" in the quantum probability distribution.
             </p>
         </div>
-        <div class="visualization-container" id="scarring-visualization">
-            <!-- Scarring visualization will be inserted here by JavaScript -->
+        <div class="visualization-container">
+            <div class="vis-content">
+                <div class="vis-icon">🌀</div>
+                <h3>Quantum Scar Patterns</h3>
+                <p class="vis-text">Scarred wavefunctions show enhanced probability density along unstable periodic orbits - the quantum system "remembers" its classical chaotic past in unexpected ways.</p>
+            </div>
         </div>
         <div class="content fade-in">
             <p>
@@ -293,6 +537,7 @@
 
     <!-- Applications -->
     <section id="applications">
+        <div class="section-bg"></div>
         <h2 class="section-title fade-in">Quantum Computing Applications</h2>
         <div class="content fade-in">
             <p>
@@ -301,19 +546,19 @@
         </div>
         <div class="research-benefits">
             <div class="benefit-card fade-in">
-                <div class="benefit-icon">🔬</div>
+                <div class="benefit-icon"><i class="fas fa-shield-alt"></i></div>
                 <h3>Reduced Decoherence</h3>
-                <p>Scarred states are more robust against environmental noise, potentially extending qubit lifetimes.</p>
+                <p>Scarred states are more robust against environmental noise, potentially extending qubit lifetimes and improving computational stability.</p>
             </div>
             <div class="benefit-card fade-in">
-                <div class="benefit-icon">⚡</div>
+                <div class="benefit-icon"><i class="fas fa-bolt"></i></div>
                 <h3>Lower Heating Rates</h3>
-                <p>By engineering trap geometries, we can minimize unwanted energy absorption in ion traps.</p>
+                <p>By engineering trap geometries based on scarring principles, we can minimize unwanted energy absorption in ion traps.</p>
             </div>
             <div class="benefit-card fade-in">
-                <div class="benefit-icon">🔄</div>
+                <div class="benefit-icon"><i class="fas fa-cogs"></i></div>
                 <h3>Improved Gates</h3>
-                <p>Controlled scarring could lead to more precise quantum operations and higher fidelity gates.</p>
+                <p>Controlled scarring could lead to more precise quantum operations, higher fidelity gates, and more efficient quantum algorithms.</p>
             </div>
         </div>
         <div class="content fade-in">
@@ -326,6 +571,7 @@
 
     <!-- Call to Action -->
     <section id="cta">
+        <div class="section-bg"></div>
         <h2 class="section-title fade-in">Join the Quantum Frontier</h2>
         <div class="content fade-in">
             <p>
@@ -338,61 +584,90 @@
         </div>
         <div class="research-benefits">
             <div class="benefit-card fade-in">
-                <div class="benefit-icon">🌌</div>
+                <div class="benefit-icon"><i class="fas fa-atom"></i></div>
                 <h3>Fundamental Physics</h3>
-                <p>Explore deep questions about quantum-classical correspondence.</p>
+                <p>Explore deep questions about quantum-classical correspondence and the foundations of quantum mechanics.</p>
             </div>
             <div class="benefit-card fade-in">
-                <div class="benefit-icon">💻</div>
+                <div class="benefit-icon"><i class="fas fa-laptop-code"></i></div>
                 <h3>Computational Challenges</h3>
-                <p>Work with cutting-edge simulations and data analysis techniques.</p>
+                <p>Work with cutting-edge simulations, data analysis techniques, and quantum algorithms.</p>
             </div>
             <div class="benefit-card fade-in">
-                <div class="benefit-icon">🚀</div>
+                <div class="benefit-icon"><i class="fas fa-rocket"></i></div>
                 <h3>Real-World Impact</h3>
-                <p>Contribute directly to advancing quantum computing technology.</p>
+                <p>Contribute directly to advancing quantum computing technology with practical applications.</p>
             </div>
         </div>
         <a href="#" class="cta-button fade-in">Start Your Quantum Journey</a>
     </section>
 
+    <footer>
+        <p>Quantum Scarring Research &copy; 2023 | Exploring the boundaries between classical and quantum worlds</p>
+    </footer>
+
     <script>
-        // Simple particle system for background
-        function createParticles(containerId, count = 50) {
+        // Enhanced particle system for background
+        function createParticles(containerId, count = 80) {
             const container = document.getElementById(containerId);
+            const colors = ['#7e22ce', '#06b6d4', '#10b981', '#a855f7'];
+            
             for (let i = 0; i < count; i++) {
                 const particle = document.createElement('div');
+                const size = Math.random() * 5 + 2;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
                 particle.style.position = 'absolute';
-                particle.style.width = Math.random() * 5 + 2 + 'px';
-                particle.style.height = particle.style.width;
-                particle.style.backgroundColor = 'rgba(255, 255, 255, ' + (Math.random() * 0.3 + 0.1) + ')';
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.backgroundColor = color;
                 particle.style.borderRadius = '50%';
                 particle.style.left = Math.random() * 100 + '%';
                 particle.style.top = Math.random() * 100 + '%';
+                particle.style.opacity = Math.random() * 0.6 + 0.2;
+                particle.style.boxShadow = `0 0 ${size * 2}px ${size}px ${color}40`;
                 container.appendChild(particle);
                 
-                // Animate particles
-                animateParticle(particle);
+                // Animate particles with varied movements
+                animateParticle(particle, i % 3);
             }
         }
         
-        function animateParticle(particle) {
+        function animateParticle(particle, type) {
             const duration = Math.random() * 20 + 10;
-            const keyframes = [
-                { transform: 'translate(0, 0)' },
-                { transform: `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px)` }
-            ];
+            let keyframes;
+            
+            if (type === 0) {
+                // Horizontal movement
+                keyframes = [
+                    { transform: 'translate(0, 0)' },
+                    { transform: `translate(${Math.random() * 100 - 50}px, 0)` }
+                ];
+            } else if (type === 1) {
+                // Vertical movement
+                keyframes = [
+                    { transform: 'translate(0, 0)' },
+                    { transform: `translate(0, ${Math.random() * 100 - 50}px)` }
+                ];
+            } else {
+                // Diagonal movement
+                keyframes = [
+                    { transform: 'translate(0, 0)' },
+                    { transform: `translate(${Math.random() * 80 - 40}px, ${Math.random() * 80 - 40}px)` }
+                ];
+            }
             
             particle.animate(keyframes, {
                 duration: duration * 1000,
                 iterations: Infinity,
-                direction: 'alternate'
+                direction: 'alternate',
+                easing: 'ease-in-out'
             });
         }
         
         // Scroll animations
         function initScrollAnimations() {
-            const fadeElements = document.querySelectorAll('.fade-in');
+            const fadeElements = document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right');
             
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -400,16 +675,17 @@
                         entry.target.classList.add('visible');
                     }
                 });
-            }, { threshold: 0.1 });
+            }, { threshold: 0.15 });
             
             fadeElements.forEach(el => observer.observe(el));
         }
         
-        // Navigation dots
+        // Navigation dots with scroll snapping
         function initNavigation() {
             const dots = document.querySelectorAll('.dot');
             const sections = document.querySelectorAll('section');
             
+            // Click on dots to scroll to sections
             dots.forEach(dot => {
                 dot.addEventListener('click', () => {
                     const targetId = dot.getAttribute('data-section');
@@ -422,10 +698,13 @@
             // Update active dot on scroll
             window.addEventListener('scroll', () => {
                 let current = '';
+                const scrollPos = window.scrollY + window.innerHeight / 2;
+                
                 sections.forEach(section => {
                     const sectionTop = section.offsetTop;
                     const sectionHeight = section.clientHeight;
-                    if (pageYOffset >= sectionTop - sectionHeight / 3) {
+                    
+                    if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
                         current = section.getAttribute('id');
                     }
                 });
@@ -439,51 +718,46 @@
             });
         }
         
-        // Simple visualizations (placeholder - would be enhanced with Three.js in a real implementation)
-        function createVisualizations() {
-            // Chaos visualization
-            const chaosContainer = document.getElementById('chaos-visualization');
-            chaosContainer.innerHTML = `
-                <div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.3);">
-                    <div style="text-align:center;">
-                        <div style="font-size:4rem;">🎱</div>
-                        <p>Chaotic billiard ball trajectories</p>
-                        <p><small>In a real implementation, this would show animated chaotic paths</small></p>
-                    </div>
-                </div>
-            `;
+        // Add scroll snapping behavior
+        function initScrollSnap() {
+            let isScrolling = false;
             
-            // Ion visualization
-            const ionContainer = document.getElementById('ion-visualization');
-            ionContainer.innerHTML = `
-                <div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.3);">
-                    <div style="text-align:center;">
-                        <div style="font-size:4rem;">⚛️</div>
-                        <p>Trapped ion in electromagnetic field</p>
-                        <p><small>In a real implementation, this would show a 3D ion trap</small></p>
-                    </div>
-                </div>
-            `;
-            
-            // Scarring visualization
-            const scarringContainer = document.getElementById('scarring-visualization');
-            scarringContainer.innerHTML = `
-                <div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.3);">
-                    <div style="text-align:center;">
-                        <div style="font-size:4rem;">🌀</div>
-                        <p>Quantum wavefunction showing scarring pattern</p>
-                        <p><small>In a real implementation, this would show animated probability densities</small></p>
-                    </div>
-                </div>
-            `;
+            window.addEventListener('scroll', () => {
+                if (!isScrolling) {
+                    window.requestAnimationFrame(() => {
+                        const sections = document.querySelectorAll('section');
+                        const scrollPos = window.scrollY;
+                        let closestSection = sections[0];
+                        let closestDistance = Math.abs(scrollPos - sections[0].offsetTop);
+                        
+                        sections.forEach(section => {
+                            const distance = Math.abs(scrollPos - section.offsetTop);
+                            if (distance < closestDistance) {
+                                closestDistance = distance;
+                                closestSection = section;
+                            }
+                        });
+                        
+                        // Only snap if we're close to a section
+                        if (closestDistance < window.innerHeight / 3) {
+                            isScrolling = true;
+                            closestSection.scrollIntoView({ behavior: 'smooth' });
+                            
+                            setTimeout(() => {
+                                isScrolling = false;
+                            }, 1000);
+                        }
+                    });
+                }
+            });
         }
         
         // Initialize everything when page loads
         window.addEventListener('DOMContentLoaded', () => {
-            createParticles('hero-particles', 80);
+            createParticles('hero-particles', 100);
             initScrollAnimations();
             initNavigation();
-            createVisualizations();
+            initScrollSnap();
         });
     </script>
 </body>

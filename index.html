@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Scarring: Where Classical Chaos Meets Quantum Order</title>
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #00cdac;
+            --dark: #121212;
+            --light: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        section {
+            min-height: 100vh;
+            padding: 5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .content {
+            max-width: 1000px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .visualization-container {
+            width: 100%;
+            height: 400px;
+            margin: 2rem 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Navigation */
+        .nav-dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .dot.active {
+            background-color: var(--accent);
+            transform: scale(1.3);
+        }
+        
+        /* Hero Section */
+        #hero {
+            background: linear-gradient(135deg, var(--dark) 0%, #1a1a2e 100%);
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-top: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(106, 17, 203, 0.6);
+        }
+        
+        /* Chaos Section */
+        #chaos {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        
+        /* Trapped Ions Section */
+        #trapped-ions {
+            background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+        }
+        
+        /* Scarring Section */
+        #scarring {
+            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+        }
+        
+        /* Applications Section */
+        #applications {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        
+        /* CTA Section */
+        #cta {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            text-align: center;
+        }
+        
+        .research-benefits {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 250px;
+            transition: transform 0.3s ease;
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .benefit-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Animation classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Particle background */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Dots -->
+    <div class="nav-dots">
+        <div class="dot active" data-section="hero"></div>
+        <div class="dot" data-section="chaos"></div>
+        <div class="dot" data-section="trapped-ions"></div>
+        <div class="dot" data-section="scarring"></div>
+        <div class="dot" data-section="applications"></div>
+        <div class="dot" data-section="cta"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="particles" id="hero-particles"></div>
+        <h1 class="hero-title fade-in">Quantum Scarring</h1>
+        <p class="hero-subtitle fade-in">Where Classical Chaos Meets Quantum Order</p>
+        <p class="content fade-in">
+            Discover how unpredictable classical systems create surprising patterns in the quantum world, 
+            and how this phenomenon could revolutionize quantum computing.
+        </p>
+        <a href="#chaos" class="cta-button fade-in">Explore the Science</a>
+    </section>
+
+    <!-- Chaos Explained -->
+    <section id="chaos">
+        <h2 class="section-title fade-in">The Chaos Beneath</h2>
+        <div class="content fade-in">
+            <p>
+                In classical physics, chaotic systems are extremely sensitive to initial conditions - 
+                the famous "butterfly effect". Billiard balls bouncing in irregular containers exhibit this chaos, 
+                with trajectories that quickly become unpredictable.
+            </p>
+        </div>
+        <div class="visualization-container" id="chaos-visualization">
+            <!-- Chaos visualization will be inserted here by JavaScript -->
+        </div>
+        <div class="content fade-in">
+            <p>
+                This chaos isn't just theoretical - it appears in everything from planetary orbits 
+                to weather patterns. But what happens when we shrink these systems down to quantum scales?
+            </p>
+        </div>
+    </section>
+
+    <!-- Trapped Ion Systems -->
+    <section id="trapped-ions">
+        <h2 class="section-title fade-in">Trapped Ions: Quantum Billiards</h2>
+        <div class="content fade-in">
+            <p>
+                In quantum computing, we can trap individual ions (charged atoms) using electromagnetic fields, 
+                creating microscopic "billiard tables" where quantum particles bounce around.
+            </p>
+        </div>
+        <div class="visualization-container" id="ion-visualization">
+            <!-- Ion trap visualization will be inserted here by JavaScript -->
+        </div>
+        <div class="content fade-in">
+            <p>
+                By controlling the shape of these traps and how particles bounce off boundaries, 
+                we can engineer quantum systems with specific properties - a key insight from your research.
+            </p>
+        </div>
+    </section>
+
+    <!-- Quantum Scarring -->
+    <section id="scarring">
+        <h2 class="section-title fade-in">The Quantum Scar Mystery</h2>
+        <div class="content fade-in">
+            <p>
+                Here's the surprising part: in chaotic quantum systems, the wavefunctions don't spread out evenly 
+                as we might expect. Instead, they sometimes concentrate along the paths of unstable classical orbits - 
+                creating "scars" in the quantum probability distribution.
+            </p>
+        </div>
+        <div class="visualization-container" id="scarring-visualization">
+            <!-- Scarring visualization will be inserted here by JavaScript -->
+        </div>
+        <div class="content fade-in">
+            <p>
+                These quantum scars are like ghosts of classical chaos, patterns that persist even when 
+                the classical system is completely unpredictable. Your research explores how we can control 
+                and utilize these scars by tuning collision properties.
+            </p>
+        </div>
+    </section>
+
+    <!-- Applications -->
+    <section id="applications">
+        <h2 class="section-title fade-in">Quantum Computing Applications</h2>
+        <div class="content fade-in">
+            <p>
+                Understanding and controlling quantum scarring has direct applications in building better quantum computers:
+            </p>
+        </div>
+        <div class="research-benefits">
+            <div class="benefit-card fade-in">
+                <div class="benefit-icon">🔬</div>
+                <h3>Reduced Decoherence</h3>
+                <p>Scarred states are more robust against environmental noise, potentially extending qubit lifetimes.</p>
+            </div>
+            <div class="benefit-card fade-in">
+                <div class="benefit-icon">⚡</div>
+                <h3>Lower Heating Rates</h3>
+                <p>By engineering trap geometries, we can minimize unwanted energy absorption in ion traps.</p>
+            </div>
+            <div class="benefit-card fade-in">
+                <div class="benefit-icon">🔄</div>
+                <h3>Improved Gates</h3>
+                <p>Controlled scarring could lead to more precise quantum operations and higher fidelity gates.</p>
+            </div>
+        </div>
+        <div class="content fade-in">
+            <p>
+                Your research bridges classical dynamics and quantum mechanics, offering new tools 
+                for the practical challenges of quantum hardware design.
+            </p>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section id="cta">
+        <h2 class="section-title fade-in">Join the Quantum Frontier</h2>
+        <div class="content fade-in">
+            <p>
+                Quantum scarring sits at the intersection of classical chaos, quantum mechanics, and topological analysis - 
+                a rich field with many open questions and practical applications.
+            </p>
+            <p style="margin-top: 2rem;">
+                As a student researcher, you could help unravel these mysteries and contribute to the next generation of quantum technologies.
+            </p>
+        </div>
+        <div class="research-benefits">
+            <div class="benefit-card fade-in">
+                <div class="benefit-icon">🌌</div>
+                <h3>Fundamental Physics</h3>
+                <p>Explore deep questions about quantum-classical correspondence.</p>
+            </div>
+            <div class="benefit-card fade-in">
+                <div class="benefit-icon">💻</div>
+                <h3>Computational Challenges</h3>
+                <p>Work with cutting-edge simulations and data analysis techniques.</p>
+            </div>
+            <div class="benefit-card fade-in">
+                <div class="benefit-icon">🚀</div>
+                <h3>Real-World Impact</h3>
+                <p>Contribute directly to advancing quantum computing technology.</p>
+            </div>
+        </div>
+        <a href="#" class="cta-button fade-in">Start Your Quantum Journey</a>
+    </section>
+
+    <script>
+        // Simple particle system for background
+        function createParticles(containerId, count = 50) {
+            const container = document.getElementById(containerId);
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = Math.random() * 5 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.backgroundColor = 'rgba(255, 255, 255, ' + (Math.random() * 0.3 + 0.1) + ')';
+                particle.style.borderRadius = '50%';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                container.appendChild(particle);
+                
+                // Animate particles
+                animateParticle(particle);
+            }
+        }
+        
+        function animateParticle(particle) {
+            const duration = Math.random() * 20 + 10;
+            const keyframes = [
+                { transform: 'translate(0, 0)' },
+                { transform: `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px)` }
+            ];
+            
+            particle.animate(keyframes, {
+                duration: duration * 1000,
+                iterations: Infinity,
+                direction: 'alternate'
+            });
+        }
+        
+        // Scroll animations
+        function initScrollAnimations() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            fadeElements.forEach(el => observer.observe(el));
+        }
+        
+        // Navigation dots
+        function initNavigation() {
+            const dots = document.querySelectorAll('.dot');
+            const sections = document.querySelectorAll('section');
+            
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    const targetId = dot.getAttribute('data-section');
+                    const targetSection = document.getElementById(targetId);
+                    
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+            
+            // Update active dot on scroll
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (pageYOffset >= sectionTop - sectionHeight / 3) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                dots.forEach(dot => {
+                    dot.classList.remove('active');
+                    if (dot.getAttribute('data-section') === current) {
+                        dot.classList.add('active');
+                    }
+                });
+            });
+        }
+        
+        // Simple visualizations (placeholder - would be enhanced with Three.js in a real implementation)
+        function createVisualizations() {
+            // Chaos visualization
+            const chaosContainer = document.getElementById('chaos-visualization');
+            chaosContainer.innerHTML = `
+                <div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.3);">
+                    <div style="text-align:center;">
+                        <div style="font-size:4rem;">🎱</div>
+                        <p>Chaotic billiard ball trajectories</p>
+                        <p><small>In a real implementation, this would show animated chaotic paths</small></p>
+                    </div>
+                </div>
+            `;
+            
+            // Ion visualization
+            const ionContainer = document.getElementById('ion-visualization');
+            ionContainer.innerHTML = `
+                <div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.3);">
+                    <div style="text-align:center;">
+                        <div style="font-size:4rem;">⚛️</div>
+                        <p>Trapped ion in electromagnetic field</p>
+                        <p><small>In a real implementation, this would show a 3D ion trap</small></p>
+                    </div>
+                </div>
+            `;
+            
+            // Scarring visualization
+            const scarringContainer = document.getElementById('scarring-visualization');
+            scarringContainer.innerHTML = `
+                <div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.3);">
+                    <div style="text-align:center;">
+                        <div style="font-size:4rem;">🌀</div>
+                        <p>Quantum wavefunction showing scarring pattern</p>
+                        <p><small>In a real implementation, this would show animated probability densities</small></p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Initialize everything when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            createParticles('hero-particles', 80);
+            initScrollAnimations();
+            initNavigation();
+            createVisualizations();
+        });
+    </script>
+</body>
+</html>

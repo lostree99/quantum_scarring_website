@@ -344,7 +344,7 @@
     <div class="container hero-content">
       <h1>Quantum Scarring</h1>
       <p class="subtitle">How Classical Orbits Leave Their Mark on Quantum Systems</p>
-      <p style="max-width: 700px; margin: 0 auto 2rem;">Imagine trapping ions in electromagnetic fields and watching them dance between quantum and classical behavior. Quantum scars are nature's way of remembering classical trajectories—even in fully chaotic quantum systems. This discovery is reshaping how we think about quantum computing, from protecting qubits to understanding thermalization.</p>
+      <p style="max-width: 700px; margin: 0 auto 2rem;">Imagine trapping ions in electromagnetic fields and watching them dance between quantum and classical behavior. Quantum scars are nature's way of remembering classical trajectories, even in fully chaotic quantum systems. This discovery is reshaping how we think about quantum computing, from protecting qubits to understanding thermalization.</p>
       <div>
         <a href="#intro" class="btn">Begin the Story</a>
         <a href="#applications" class="btn btn-secondary">Why Trapped Ions Care</a>
@@ -359,16 +359,16 @@
       
       <p>In 1984, physicist Eric Heller was studying quantum particles bouncing inside a stadium-shaped billiard when he discovered something shocking: <strong>the quantum probability wasn't spreading uniformly as everyone expected</strong>.</p>
 
-      <p>Instead, certain quantum states showed intense concentrations along specific paths—the exact paths of unstable periodic orbits from classical mechanics. He called these mysterious patterns <strong>"quantum scars"</strong> because they looked like scars left by the classical orbits on the quantum wavefunction.</p>
+      <p>Instead, certain quantum states showed intense concentrations along specific paths, the exact paths of unstable periodic orbits from classical mechanics. He called these mysterious patterns <strong>"quantum scars"</strong> because they looked like scars left by the classical orbits on the quantum wavefunction.</p>
       
       <div class="highlight">
-        <p><strong>The Core Paradox:</strong> Classical chaotic systems explore all space uniformly (ergodicity). Quantum mechanics says particles should too. But quantum scars violate this—certain quantum states "remember" unstable classical orbits and cluster around them, even though those orbits are infinitely unstable!</p>
+        <p><strong>The Core Paradox:</strong> Classical chaotic systems explore all space uniformly (ergodicity). Quantum mechanics says particles should too. But quantum scars violate this, certain quantum states "remember" unstable classical orbits and cluster around them, even though those orbits are infinitely unstable!</p>
       </div>
 
       <div class="info-card">
         <h3>Why This Matters for Trapped Ions</h3>
-        <p>Trapped ions behave exactly like quantum billiards. When you confine ions with electromagnetic fields, they experience a potential that creates periodic orbits—some stable, some unstable. <strong>Quantum scars in ion traps mean we can predict and control how quantum information localizes in these systems.</strong></p>
-        <p>This isn't just theory: experiments with Rydberg atom chains (2017) and trapped ions (ongoing) have confirmed many-body quantum scars that prevent thermalization—keeping quantum states alive far longer than expected.</p>
+        <p>Trapped ions behave exactly like quantum billiards. When you confine ions with electromagnetic fields, they experience a potential that creates periodic orbits, some stable, some unstable. <strong>Quantum scars in ion traps mean we can predict and control how quantum information localizes in these systems.</strong></p>
+        <p>This isn't just theory: experiments with Rydberg atom chains (2017) and trapped ions (ongoing) have confirmed many-body quantum scars that prevent thermalization, keeping quantum states alive far longer than expected.</p>
       </div>
 
       <p style="text-align: center; margin-top: 2rem;"><strong>Let's build intuition step by step...</strong></p>
@@ -380,8 +380,37 @@
     <div class="container">
       <h2>Step 1: Classical Chaos & The Butterfly Effect</h2>
       
-      <p>To understand quantum scars, we first need to understand <strong>classical chaos</strong>. Chaos doesn't mean random—it means <strong>extreme sensitivity to initial conditions</strong>.</p>
+      <p>To understand quantum scars, we first need to understand <strong>classical chaos</strong>. Chaos doesn't mean random, it means <strong>extreme sensitivity to initial conditions</strong>.</p>
 
+      <!-- Interactive Double Pendulum -->
+  <section id="interactive">
+    <div class="container">
+      <h2>Interactive: Experience Chaos</h2>
+      
+      <p>The double pendulum is one of the simplest chaotic systems. It has periodic orbits (try θ₁=0, θ₂=0 for a simple orbit), but most initial conditions lead to chaos. Watch how two pendulums starting with a 0.0005 radian difference diverge dramatically.</p>
+
+      <div class="canvas-container" style="height: 600px;">
+        <canvas id="dpCanvas"></canvas>
+      </div>
+      
+      <div class="controls">
+        <button id="playBtn" class="btn">Play</button>
+        <button id="resetBtn" class="btn btn-secondary">Reset</button>
+        <label>θ₁ <input id="a1" type="range" min="-3.14" max="3.14" step="0.001" value="1.0"></label>
+        <label>θ₂ <input id="a2" type="range" min="-3.14" max="3.14" step="0.001" value="1.05"></label>
+        <label>Speed <input id="speed" type="range" min="0.5" max="5" step="0.1" value="2.5"></label>
+        <label>Trail <input id="trailLen" type="range" min="20" max="800" step="10" value="300"></label>
+      </div>
+
+      <div class="info-card">
+        <h3>Understanding the Butterfly Effect</h3>
+        <p><strong>Yellow pendulum:</strong> θ₁, θ₂</p>
+        <p><strong>Orange pendulum:</strong> θ₁+0.0005, θ₂+0.0005 (0.03° difference!)</p>
+        <p>This sensitive dependence is chaos. Yet if you quantize this system (make it obey quantum mechanics), quantum scars would appear along its periodic orbits, quantum mechanics partially suppresses the chaos by remembering those special trajectories!</p>
+      </div>
+    </div>
+  </section>
+      
       <div class="canvas-container">
         <canvas id="chaosCanvas"></canvas>
         <div class="instructions">
@@ -396,8 +425,8 @@
 
       <div class="info-card">
         <h3>What You're Seeing: The Stadium Billiard</h3>
-        <p>This is a simplified version of the Bunimovich stadium—two semicircles connected by parallel walls. It's the same geometry where Heller discovered quantum scars!</p>
-        <p><strong>Key insight:</strong> Three particles starting within microns of each other end up in completely different places. This is classical chaos. The particles eventually explore all available space uniformly—this is called <strong>ergodicity</strong>.</p>
+        <p>This is a simplified version of the Bunimovich stadium, two semicircles connected by parallel walls. It's the same geometry where Heller discovered quantum scars!</p>
+        <p><strong>Key insight:</strong> Three particles starting within microns of each other end up in completely different places. This is classical chaos. The particles eventually explore all available space uniformly, this is called <strong>ergodicity</strong>.</p>
       </div>
 
       <div class="info-card">
@@ -415,7 +444,7 @@
       <p>When physicists first tried to understand the quantum version of chaotic systems, they had a clear prediction based on the <strong>correspondence principle</strong>: as quantum systems get larger, they should behave more like their classical counterparts.</p>
 
       <div class="highlight">
-        <p><strong>The Expectation:</strong> Since the classical system is ergodic (uniformly exploring all space), the quantum eigenstates should also be uniform—spread evenly throughout the available space with only random fluctuations. This is called <strong>quantum ergodicity</strong>.</p>
+        <p><strong>The Expectation:</strong> Since the classical system is ergodic (uniformly exploring all space), the quantum eigenstates should also be uniform, spread evenly throughout the available space with only random fluctuations. This is called <strong>quantum ergodicity</strong>.</p>
       </div>
 
       <div class="visual-comparison">
@@ -431,7 +460,7 @@
           <div class="visual-content">
             <canvas id="typicalCanvas" width="400" height="400"></canvas>
           </div>
-          <p style="font-size: 0.95rem;">Most quantum eigenstates DO look like this—no obvious structure, probability distributed throughout.</p>
+          <p style="font-size: 0.95rem;">Most quantum eigenstates DO look like this, no obvious structure, probability distributed throughout.</p>
         </div>
       </div>
 
@@ -445,12 +474,12 @@
   <!-- The Discovery -->
   <section id="discovery">
     <div class="container">
-      <h2>Step 3: The Discovery—Quantum Scars</h2>
+      <h2>Step 3: The Discovery, Quantum Scars</h2>
       
       <p>In 1984, Eric Heller calculated the quantum eigenstates of the stadium billiard. Most looked uniform as expected. But then he found <strong>exceptional states</strong>...</p>
       
       <div class="highlight">
-        <p><strong>The Stunning Discovery:</strong> Some eigenstates showed intense probability density concentrated along specific classical periodic orbits—orbits that are <strong>unstable</strong>! These "quantum scars" directly violate the expected uniform distribution.</p>
+        <p><strong>The Stunning Discovery:</strong> Some eigenstates showed intense probability density concentrated along specific classical periodic orbits, orbits that are <strong>unstable</strong>! These "quantum scars" directly violate the expected uniform distribution.</p>
       </div>
 
       <div class="visual-comparison">
@@ -459,7 +488,7 @@
           <div class="visual-content">
             <canvas id="scarCanvas" width="400" height="400"></canvas>
           </div>
-          <p style="font-size: 0.95rem;">Enhanced probability along an unstable periodic orbit—a quantum scar! The wavefunction "remembers" the classical orbit.</p>
+          <p style="font-size: 0.95rem;">Enhanced probability along an unstable periodic orbit, a quantum scar! The wavefunction "remembers" the classical orbit.</p>
         </div>
         <div class="visual-box">
           <div class="visual-label">Classical Periodic Orbit</div>
@@ -478,7 +507,7 @@
 
       <div class="info-card">
         <h3>Direct Visualization (2024)</h3>
-        <p>For 40 years, scars were observed indirectly through simulations. In 2024, researchers finally directly visualized quantum scars in graphene quantum dots using scanning tunneling microscopy—actually seeing the enhanced probability density along periodic orbits in a real solid-state system!</p>
+        <p>For 40 years, scars were observed indirectly through simulations. In 2024, researchers finally directly visualized quantum scars in graphene quantum dots using scanning tunneling microscopy, actually seeing the enhanced probability density along periodic orbits in a real solid-state system!</p>
       </div>
     </div>
   </section>
@@ -493,17 +522,17 @@
       <div class="two-column">
         <div class="info-card">
           <h3>1. Classical Structure</h3>
-          <p>Even in chaos, there exist special <strong>periodic orbits</strong>—closed paths that a classical particle can follow. These orbits are unstable (nearby trajectories diverge exponentially), but they exist and form a dense skeleton in phase space.</p>
+          <p>Even in chaos, there exist special <strong>periodic orbits</strong>, closed paths that a classical particle can follow. These orbits are unstable (nearby trajectories diverge exponentially), but they exist and form a dense skeleton in phase space.</p>
         </div>
         
         <div class="info-card">
           <h3>2. Quantum Interference</h3>
-          <p>Quantum particles are waves. When many quantum paths pass near a periodic orbit, they can <strong>interfere constructively</strong>. The result: enhanced probability density along the orbit—a scar!</p>
+          <p>Quantum particles are waves. When many quantum paths pass near a periodic orbit, they can <strong>interfere constructively</strong>. The result: enhanced probability density along the orbit, a scar!</p>
         </div>
       </div>
 
       <div class="highlight">
-        <p><strong>The Mechanism (Heller's Linear Theory):</strong> Launch a Gaussian wave packet along a periodic orbit. It spreads as it evolves, but returns close to itself after one period. If the spreading is moderate (orbit not too unstable), repeated returns lead to constructive interference, building up probability density—a scar—in certain eigenstates.</p>
+        <p><strong>The Mechanism (Heller's Linear Theory):</strong> Launch a Gaussian wave packet along a periodic orbit. It spreads as it evolves, but returns close to itself after one period. If the spreading is moderate (orbit not too unstable), repeated returns lead to constructive interference, building up probability density, a scar, in certain eigenstates.</p>
       </div>
 
       <div class="info-card">
@@ -530,39 +559,12 @@
           <li>Tune scar strength by adjusting anharmonicity</li>
           <li>Protect qubits by localizing quantum information in scarred states</li>
         </ul>
-        <p>This is active area of research—using scars as a resource, not just a curiosity!</p>
+        <p>This is active area of research, using scars as a resource, not just a curiosity!</p>
       </div>
     </div>
   </section>
 
-  <!-- Interactive Double Pendulum -->
-  <section id="interactive">
-    <div class="container">
-      <h2>Interactive: Experience Chaos</h2>
-      
-      <p>The double pendulum is one of the simplest chaotic systems. It has periodic orbits (try θ₁=0, θ₂=0 for a simple orbit), but most initial conditions lead to chaos. Watch how two pendulums starting with a 0.0005 radian difference diverge dramatically.</p>
-
-      <div class="canvas-container" style="height: 600px;">
-        <canvas id="dpCanvas"></canvas>
-      </div>
-      
-      <div class="controls">
-        <button id="playBtn" class="btn">Play</button>
-        <button id="resetBtn" class="btn btn-secondary">Reset</button>
-        <label>θ₁ <input id="a1" type="range" min="-3.14" max="3.14" step="0.001" value="1.0"></label>
-        <label>θ₂ <input id="a2" type="range" min="-3.14" max="3.14" step="0.001" value="1.05"></label>
-        <label>Speed <input id="speed" type="range" min="0.5" max="5" step="0.1" value="2.5"></label>
-        <label>Trail <input id="trailLen" type="range" min="20" max="800" step="10" value="300"></label>
-      </div>
-
-      <div class="info-card">
-        <h3>Understanding the Butterfly Effect</h3>
-        <p><strong>Yellow pendulum:</strong> θ₁, θ₂</p>
-        <p><strong>Orange pendulum:</strong> θ₁+0.0005, θ₂+0.0005 (0.03° difference!)</p>
-        <p>This sensitive dependence is chaos. Yet if you quantize this system (make it obey quantum mechanics), quantum scars would appear along its periodic orbits—quantum mechanics partially suppresses the chaos by remembering those special trajectories!</p>
-      </div>
-    </div>
-  </section>
+  
 
   <!-- Applications -->
   <section id="applications">
@@ -573,8 +575,8 @@
 
       <div class="info-card">
         <h3>🔬 The 2017-2018 Breakthrough</h3>
-        <p>Researchers at Harvard and MIT prepared 51 Rydberg atoms in a specific pattern and watched them evolve. <strong>Expected:</strong> rapid thermalization (scrambling of quantum information). <strong>Observed:</strong> persistent oscillations lasting much longer than expected—the system refused to thermalize!</p>
-        <p>The cause? <strong>Many-body quantum scars</strong>—a few special eigenstates embedded in an otherwise thermal spectrum that prevent thermalization when the system is initialized on them.</p>
+        <p>Researchers at Harvard and MIT prepared 51 Rydberg atoms in a specific pattern and watched them evolve. <strong>Expected:</strong> rapid thermalization (scrambling of quantum information). <strong>Observed:</strong> persistent oscillations lasting much longer than expected, the system refused to thermalize!</p>
+        <p>The cause? <strong>Many-body quantum scars</strong>, a few special eigenstates embedded in an otherwise thermal spectrum that prevent thermalization when the system is initialized on them.</p>
       </div>
 
       <div class="highlight">
@@ -585,7 +587,7 @@
         <h3>⚛️ Trapped Ions: The Perfect Platform</h3>
         <p><strong>Why trapped ions are ideal for studying and using quantum scars:</strong></p>
         <ul>
-          <li><strong>Tunable geometry:</strong> Trap shapes are programmable—we can engineer which periodic orbits (and thus scars) exist</li>
+          <li><strong>Tunable geometry:</strong> Trap shapes are programmable, we can engineer which periodic orbits (and thus scars) exist</li>
           <li><strong>Long coherence:</strong> Ions are well-isolated, allowing scars to persist</li>
           <li><strong>Precise control:</strong> We can initialize on specific scarred states</li>
           <li><strong>All-to-all interactions:</strong> Trapped ions naturally have long-range interactions, similar to Rydberg atoms where many-body scars were discovered</li>
@@ -626,7 +628,7 @@
       </div>
 
       <div class="highlight">
-        <p><strong>Recent Results (2024-2025):</strong> Multiple groups have demonstrated robust many-body scars in long-range interacting spin systems—exactly the regime of trapped ions! The field is moving from "Can we observe scars?" to "How do we use scars?"</p>
+        <p><strong>Recent Results (2024-2025):</strong> Multiple groups have demonstrated robust many-body scars in long-range interacting spin systems, exactly the regime of trapped ions! The field is moving from "Can we observe scars?" to "How do we use scars?"</p>
       </div>
     </div>
   </section>

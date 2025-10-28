@@ -382,7 +382,7 @@
       
       <p>To understand quantum scars, we first need to understand <strong>classical chaos</strong>. Chaos doesn't mean random, it means <strong>extreme sensitivity to initial conditions</strong>.</p>
       
-      <p>The double pendulum is one of the simplest chaotic systems. It has periodic orbits (try θ₁=0, θ₂=0 for a simple orbit), but most initial conditions lead to chaos. Watch how two pendulums starting with a 0.0005 radian difference diverge dramatically.</p>
+      <p>The double pendulum is one of the simplest chaotic systems. It has periodic orbits, but most initial conditions lead to chaos. Watch how two pendulums starting with a 0.0005 radian difference diverge dramatically.</p>
 
       <div class="canvas-container" style="height: 600px;">
         <canvas id="dpCanvas"></canvas>
@@ -393,14 +393,14 @@
         <button id="resetBtn" class="btn btn-secondary">Reset</button>
         <label>θ₁ <input id="a1" type="range" min="-3.14" max="3.14" step="0.001" value="1.0"></label>
         <label>θ₂ <input id="a2" type="range" min="-3.14" max="3.14" step="0.001" value="1.05"></label>
-        <label>Speed <input id="speed" type="range" min="0.5" max="5" step="0.1" value="2.5"></label>
-        <label>Trail <input id="trailLen" type="range" min="20" max="800" step="10" value="300"></label>
+        <label>Speed <input id="speed" type="range" min="0.5" max="5" step="0.1" value="5"></label>
+        <label>Trail <input id="trailLen" type="range" min="20" max="800" step="10" value="600"></label>
       </div>
 
       <div class="info-card">
         <h3>Understanding the Butterfly Effect</h3>
         <p><strong>Yellow pendulum:</strong> θ₁, θ₂</p>
-        <p><strong>Orange pendulum:</strong> θ₁+0.0005, θ₂+0.0005 (0.03° difference!)</p>
+        <p><strong>Orange pendulum:</strong> θ₁+0.0005, θ₂+0.0005 </p>
         <p>This sensitive dependence is chaos. Yet if you quantize this system (make it obey quantum mechanics), quantum scars would appear along its periodic orbits, quantum mechanics partially suppresses the chaos by remembering those special trajectories!</p>
       </div>
       

@@ -1,1263 +1,598 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Quantum Scarring - From Chaos to Trapped Ions</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    html { scroll-behavior: smooth; }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: #0a0e17;
-      color: #e8eaed;
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-    
-    section {
-      min-height: 100vh;
-      padding: 4rem 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.8s ease, transform 0.8s ease;
-    }
-    
-    section.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    
-    .container {
-      max-width: 900px;
-      width: 100%;
-    }
-    
-    h1 {
-      font-size: clamp(2.5rem, 8vw, 5rem);
-      font-weight: 800;
-      margin-bottom: 1rem;
-      color: #ffd166;
-      text-align: center;
-      line-height: 1.1;
-    }
-    
-    h2 {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      color: #ffd166;
-      text-align: center;
-    }
-    
-    h3 {
-      font-size: 1.5rem;
-      color: #ffd166;
-      margin: 2rem 0 1rem;
-    }
-    
-    p {
-      font-size: 1.1rem;
-      color: #b8c1cc;
-      margin-bottom: 1rem;
-      line-height: 1.8;
-    }
-    
-    .highlight {
-      background: rgba(255, 209, 102, 0.1);
-      border-left: 3px solid #ffd166;
-      padding: 1.5rem;
-      margin: 2rem 0;
-      border-radius: 4px;
-    }
-    
-    .highlight strong {
-      color: #ffd166;
-    }
-    
-    .canvas-container {
-      width: 100%;
-      max-width: 800px;
-      height: 500px;
-      margin: 2rem auto;
-      background: #131820;
-      border: 2px solid #1e2936;
-      border-radius: 8px;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-    
-    .btn {
-      display: inline-block;
-      padding: 0.8rem 2rem;
-      margin: 0.5rem;
-      background: #ffd166;
-      color: #0a0e17;
-      border: none;
-      border-radius: 50px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-    }
-    
-    .btn:hover {
-      background: #ffb703;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(255, 209, 102, 0.3);
-    }
-    
-    .btn-secondary {
-      background: transparent;
-      border: 2px solid #ffd166;
-      color: #ffd166;
-    }
-    
-    .btn-secondary:hover {
-      background: rgba(255, 209, 102, 0.1);
-    }
-    
-    .controls {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-top: 1rem;
-    }
-    
-    .progress-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 3px;
-      background: #ffd166;
-      z-index: 1000;
-      transition: width 0.1s ease;
-    }
-    
-    .nav-dots {
-      position: fixed;
-      right: 2rem;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 100;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    
-    .nav-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.2);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .nav-dot.active {
-      background: #ffd166;
-      transform: scale(1.3);
-    }
-    
-    .nav-dot:hover {
-      background: #ffd166;
-    }
-    
-    #hero {
-      min-height: 100vh;
-      position: relative;
-      background: #0a0e17;
-    }
-    
-    #hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=2000&q=80');
-      background-size: cover;
-      background-position: center;
-      opacity: 0.15;
-      z-index: 0;
-    }
-    
-    #hero::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(to bottom, transparent 0%, #0a0e17 100%);
-      z-index: 1;
-    }
-    
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-    }
-    
-    .subtitle {
-      font-size: 1.3rem;
-      color: #8a95a5;
-      margin-bottom: 2rem;
-    }
-    
-    .two-column {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      margin: 2rem 0;
-    }
-    
-    @media (max-width: 768px) {
-      .two-column {
-        grid-template-columns: 1fr;
-      }
-      
-      .nav-dots {
-        right: 1rem;
-      }
-    }
-    
-    .info-card {
-      background: #131820;
-      border: 1px solid #1e2936;
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin: 1rem 0;
-    }
-    
-    .instructions {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
-      background: rgba(19, 24, 32, 0.95);
-      padding: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ffd166;
-      font-size: 0.9rem;
-      max-width: 250px;
-      z-index: 10;
-    }
-    
-    ul {
-      margin-left: 1.5rem;
-      color: #b8c1cc;
-    }
-    
-    li {
-      margin: 0.5rem 0;
-    }
-    
-    strong {
-      color: #ffd166;
-    }
-    
-    label {
-      color: #b8c1cc;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    input[type="range"] {
-      width: 100px;
-    }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>From Billiards to Qubits | Quantum Chaos & You</title>
+  <meta
+    name="description"
+    content="An interactive tour from bouncing balls (billiards) to quantum bits, chaos, and trapped-ion noise — and how you can get involved in research."
+  />
 
-    .visual-comparison {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      margin: 2rem 0;
-    }
+  <!-- Fonts: heading + mono body (Courier-ish) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
 
-    .visual-box {
-      background: #131820;
-      border: 2px solid #1e2936;
-      border-radius: 8px;
-      padding: 1rem;
-      text-align: center;
-    }
-
-    .visual-label {
-      font-weight: 600;
-      color: #ffd166;
-      margin-bottom: 1rem;
-      font-size: 1.2rem;
-    }
-
-    .visual-content {
-      background: #0a0e17;
-      width: auto;
-      height: auto;
-      border-radius: 0.5px;
-      object-fit: contain;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1rem;
-      position: relative;
-      overflow: hidden;
-      
-    }
-
-    @media (max-width: 768px) {
-      .visual-comparison {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="progress-bar" id="progressBar"></div>
-  
-  <div class="nav-dots">
-    <div class="nav-dot active" data-section="0"></div>
-    <div class="nav-dot" data-section="1"></div>
-    <div class="nav-dot" data-section="2"></div>
-    <div class="nav-dot" data-section="3"></div>
-    <div class="nav-dot" data-section="4"></div>
-    <div class="nav-dot" data-section="5"></div>
-    <div class="nav-dot" data-section="6"></div>
-  </div>
-
-  <!-- Hero -->
-  <section id="hero" class="visible">
-    <div class="container hero-content">
-      <h1>Quantum Scarring</h1>
-      <p class="subtitle">How Classical Orbits Leave Their Mark on Quantum Systems</p>
-      <p style="max-width: 700px; margin: 0 auto 2rem;">Imagine trapping ions in electromagnetic fields and watching them dance between quantum and classical behavior. Quantum scars are nature's way of remembering classical trajectories, even in fully chaotic quantum systems. This discovery is reshaping how we think about quantum computing, from protecting qubits to understanding thermalization.</p>
-      <div>
-        <a href="#intro" class="btn">Begin the Story</a>
-        <a href="#applications" class="btn btn-secondary">Why Trapped Ions Care</a>
-      </div>
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#hero" class="logo">
+        <span class="logo-pill">QC</span>
+        <span class="logo-text">Quantum Chaos @ UMass</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#start">Start here</a>
+        <a href="#billiards">Interactive demo</a>
+        <a href="#thesis">My thesis</a>
+        <a href="#cta">Get involved</a>
+        <a href="#sources">Sources</a>
+      </nav>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+        ☀️
+      </button>
     </div>
-  </section>
+  </header>
 
-  <!-- Introduction -->
-  <section id="intro">
-    <div class="container">
-      <h2>What Are Quantum Scars?</h2>
-      
-      <p>In 1984, physicist Eric Heller was studying quantum particles bouncing inside a stadium-shaped billiard when he discovered something shocking: <strong>the quantum probability wasn't spreading uniformly as everyone expected</strong>.</p>
+  <main>
+    <!-- HERO SECTION -->
+    <section id="hero" class="section hero visible">
+      <div class="section-inner hero-grid">
+        <div class="hero-text">
+          <p class="eyebrow">From bouncing balls to quantum bits</p>
+          <h1>Chaos, Quantum Computers, &amp; Why Your Brain is Perfect for This</h1>
+          <p class="hero-subtitle">
+            We start with a ball bouncing in a weirdly shaped room (a
+            <strong>billiard</strong>), and end up talking about
+            <strong>noise in quantum computers</strong>. Along the way, you’ll
+            get intuition, play with an interactive demo, and see exactly
+            how you could work on this as an undergrad.
+          </p>
 
-      <p>Instead, certain quantum states showed intense concentrations along specific paths, the exact paths of unstable periodic orbits from classical mechanics. He called these mysterious patterns <strong>"quantum scars"</strong> because they looked like scars left by the classical orbits on the quantum wavefunction.</p>
-      
-      <div class="highlight">
-        <p><strong>The Core Paradox:</strong> Classical chaotic systems explore all space uniformly (ergodicity). Quantum mechanics says particles should too. But quantum scars violate this, certain quantum states "remember" unstable classical orbits and cluster around them, even though those orbits are infinitely unstable!</p>
-      </div>
-
-      <div class="info-card">
-        <h3>Why This Matters for Trapped Ions</h3>
-        <p>Trapped ions behave exactly like quantum billiards. When you confine ions with electromagnetic fields, they experience a potential that creates periodic orbits, some stable, some unstable. <strong>Quantum scars in ion traps mean we can predict and control how quantum information localizes in these systems.</strong></p>
-        <p>This isn't just theory: experiments with Rydberg atom chains (2017) and trapped ions (ongoing) have confirmed many-body quantum scars that prevent thermalization, keeping quantum states alive far longer than expected.</p>
-      </div>
-
-      <p style="text-align: center; margin-top: 2rem;"><strong>Let's build intuition step by step...</strong></p>
-    </div>
-  </section>
-
-  <!-- Classical Chaos -->
-  <section id="chaos">
-    <div class="container">
-      <h2>Step 1: Classical Chaos & The Butterfly Effect</h2>
-      
-      <p>To understand quantum scars, we first need to understand <strong>classical chaos</strong>. Chaos doesn't mean random, it means <strong>extreme sensitivity to initial conditions</strong>.</p>
-      
-      <p>The double pendulum is one of the simplest chaotic systems. It has periodic orbits, but most initial conditions lead to chaos. Watch how two pendulums starting with a 0.0005 radian difference diverge dramatically.</p>
-
-      <div class="canvas-container" style="height: 400px;">
-        <canvas id="dpCanvas"></canvas>
-      </div>
-      
-      <div class="controls">
-        <button id="playBtn" class="btn">Play</button>
-        <button id="resetBtn" class="btn btn-secondary">Reset</button>
-        <label>θ₁ <input id="a1" type="range" min="-3.14" max="3.14" step="0.001" value="1.0"></label>
-        <label>θ₂ <input id="a2" type="range" min="-3.14" max="3.14" step="0.001" value="2.05"></label>
-        <label>Speed <input id="speed" type="range" min="0.5" max="5" step="0.1" value="3.5"></label>
-        <label>Trail <input id="trailLen" type="range" min="20" max="800" step="10" value="400"></label>
-      </div>
-
-      <div class="info-card">
-        <h3>Understanding the Butterfly Effect</h3>
-        <p><strong>Yellow pendulum:</strong> θ₁, θ₂</p>
-        <p><strong>Orange pendulum:</strong> θ₁+0.0005, θ₂+0.0005 </p>
-        <p>This sensitive dependence is chaos. Yet if you quantize this system (make it obey quantum mechanics), quantum scars would appear along its periodic orbits, quantum mechanics partially suppresses the chaos by remembering those special trajectories!</p>
-      </div>
-      
-      <div class="canvas-container">
-        <canvas id="chaosCanvas"></canvas>
-        <div class="instructions">
-          <strong>Click anywhere</strong> to launch three particles from nearly identical positions. Watch them diverge exponentially!
-        </div>
-      </div>
-      
-      <div class="controls">
-        <button class="btn" onclick="resetChaos()">Reset</button>
-        <button class="btn btn-secondary" onclick="toggleChaos()">Pause/Play</button>
-      </div>
-
-      <div class="info-card">
-        <h3>What You're Seeing: The Stadium Billiard</h3>
-        <p>This is a simplified version of the Bunimovich stadium, two semicircles connected by parallel walls. It's the same geometry where Heller discovered quantum scars!</p>
-        <p><strong>Key insight:</strong> Three particles starting within microns of each other end up in completely different places. This is classical chaos. The particles eventually explore all available space uniformly, this is called <strong>ergodicity</strong>.</p>
-      </div>
-
-      <div class="info-card">
-        <h3>Connection to Trapped Ions</h3>
-        <p>When ions are trapped in non-harmonic potentials (anharmonic traps, optical lattices, or driven systems), their classical motion can be chaotic. Understanding this classical chaos is the first step to predicting where quantum scars will appear.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Quantum Expectations -->
-  <section id="quantum">
-    <div class="container">
-      <h2>Step 2: The Quantum Expectation</h2>
-      
-      <p>When physicists first tried to understand the quantum version of chaotic systems, they had a clear prediction based on the <strong>correspondence principle</strong>: as quantum systems get larger, they should behave more like their classical counterparts.</p>
-
-      <div class="highlight">
-        <p><strong>The Expectation:</strong> Since the classical system is ergodic (uniformly exploring all space), the quantum eigenstates should also be uniform, spread evenly throughout the available space with only random fluctuations. This is called <strong>quantum ergodicity</strong>.</p>
-      </div>
-
-      <div class="visual-comparison">
-        <div class="visual-box">
-          <div class="visual-label">Expected: Uniform "Chaotic" State</div>
-          <div class="visual-content">
-            <canvas id="uniformCanvas" width="400" height="400"></canvas>
+          <div class="hero-actions">
+            <a href="#start" class="btn primary">Start with the basics ⬇</a>
+            <a href="#cta" class="btn ghost">I want to help build quantum tech →</a>
           </div>
-          <p style="font-size: 0.95rem;">Probability density spread roughly evenly across the billiard, like TV static. This is what quantum ergodicity predicts.</p>
+
+          <p class="hero-tagline">
+            A thesis project by <span class="highlight">Ayush</span> ·
+            Math × ECE × Quantum Chaos × Trapped Ions
+          </p>
         </div>
-        <div class="visual-box">
-          <div class="visual-label">Typical Eigenstate</div>
-          <div class="visual-content">
-            <canvas id="typicalCanvas" width="400" height="400"></canvas>
+
+        <div class="hero-card">
+          <div class="hero-orbit">
+            <div class="hero-orbit-inner">
+              <span class="orbit-dot"></span>
+            </div>
+            <canvas id="mini-orbit" aria-hidden="true"></canvas>
           </div>
-          <p style="font-size: 0.95rem;">Most quantum eigenstates DO look like this, no obvious structure, probability distributed throughout.</p>
-        </div>
-      </div>
-
-      <div class="info-card">
-        <h3>The Quantum Ergodicity Theorems</h3>
-        <p>Mathematical theorems by Schnirelman, Zelditch, and Colin de Verdière proved that <strong>almost all</strong> eigenstates of chaotic systems become uniformly distributed. This was the accepted wisdom until Heller's discovery...</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- The Discovery -->
-  <section id="discovery">
-    <div class="container">
-      <h2>Step 3: The Discovery, Quantum Scars</h2>
-      
-      <p>In 1984, Eric Heller calculated the quantum eigenstates of the stadium billiard. Most looked uniform as expected. But then he found <strong>exceptional states</strong>...</p>
-      
-      <div class="highlight">
-        <p><strong>The Stunning Discovery:</strong> Some eigenstates showed intense probability density concentrated along specific classical periodic orbits, orbits that are <strong>unstable</strong>! These "quantum scars" directly violate the expected uniform distribution.</p>
-      </div>
-
-      <div class="visual-comparison">
-        <div class="visual-box">
-          <div class="visual-label">Scarred Eigenstate</div>
-          <div class="visual-content">
-            <canvas id="scarCanvas" width="400" height="400"></canvas>
+          <div class="hero-card-body">
+            <h2>Big Idea</h2>
+            <p>
+              Use <strong>non-standard billiards</strong> to understand how
+              tiny imperfections can cause
+              <strong>chaotic amplification</strong> — and connect that to
+              <strong>unexpected heating</strong> in trapped-ion quantum
+              computers.
+            </p>
+            <ul class="hero-list">
+              <li>Monodromy matrices &amp; Lyapunov exponents</li>
+              <li>Geometry &amp; curvature of billiard boundaries</li>
+              <li>Connections to anomalous heating in ion traps</li>
+            </ul>
           </div>
-          <p style="font-size: 0.95rem;">Enhanced probability along an unstable periodic orbit, a quantum scar! The wavefunction "remembers" the classical orbit.</p>
         </div>
-        <div class="visual-box">
-          <div class="visual-label">Classical Periodic Orbit</div>
-          <div class="visual-content">
-            <canvas id="orbitCanvas" width="400" height="400"></canvas>
+      </div>
+    </section>
+
+    <!-- START HERE / BASICS -->
+    <section id="start" class="section">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Start here: what’s going on?</h2>
+          <p>
+            No physics degree required. If you’ve done a bit of calculus and
+            linear algebra, you’re absolutely fine. Even if you haven’t, you
+            can still follow the story.
+          </p>
+        </header>
+
+        <div class="cards-grid">
+          <article class="card basics-card">
+            <h3>What is a qubit?</h3>
+            <p>
+              A <strong>qubit</strong> is like a bit, but it can be in a
+              combination of <code>|0⟩</code> and <code>|1⟩</code> at the
+              same time. You can picture it as a point on a sphere (the
+              <em>Bloch sphere</em>) instead of a simple 0/1 toggle.
+            </p>
+            <p class="muted">
+              The catch: qubits are fragile. The environment constantly tries
+              to mess them up.
+            </p>
+          </article>
+
+          <article class="card basics-card">
+            <h3>What is “noise”?</h3>
+            <p>
+              Noise is any random disturbance that nudges the quantum state
+              away from where it’s supposed to be. Stray electric fields,
+              surface roughness, vibrations — they all show up as errors in
+              our quantum logic.
+            </p>
+            <p class="muted">
+              In trapped-ion devices, ions can mysteriously “heat up” even when
+              we think we’ve shielded everything. That’s called
+              <strong>anomalous heating</strong>.
+            </p>
+          </article>
+
+          <article class="card basics-card">
+            <h3>What is chaos?</h3>
+            <p>
+              Chaos isn’t just “randomness.” It’s when a system follows strict
+              deterministic rules, but <strong>tiny changes in initial
+              conditions explode</strong> over time.
+            </p>
+            <p class="muted">
+              Billiards — literally a ball bouncing in a shaped table — are a
+              classic playground for chaos. Change the shape a tiny bit, and
+              everything changes.
+            </p>
+          </article>
+        </div>
+
+        <div class="info-strip">
+          <p>
+            The big question: <strong>Can we use the math of chaotic
+            billiards to understand and tame noise in quantum hardware?</strong>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE BILLIARDS DEMO -->
+    <section id="billiards" class="section section-alt">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Play with a toy billiard: how roughness creates chaos</h2>
+          <p>
+            This is a <em>simplified</em> billiard. A point “particle” bounces
+            inside a box. You control the <strong>surface roughness</strong>.
+            As roughness increases, the trajectory becomes harder to predict.
+          </p>
+        </header>
+
+        <div class="billiard-layout">
+          <div class="billiard-canvas-wrap card">
+            <div class="billiard-header">
+              <span class="badge">Interactive</span>
+              <span class="billiard-label">Toy billiard demo (not exact physics)</span>
+            </div>
+            <canvas id="billiard-canvas" width="480" height="320">
+              Your browser doesn’t support canvas.
+            </canvas>
+            <div class="billiard-controls">
+              <label class="slider-label" for="roughness">
+                Surface roughness / noise
+                <span id="roughness-value">0.00</span>
+              </label>
+              <input
+                id="roughness"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value="0"
+              />
+              <div class="billiard-buttons">
+                <button id="billiard-toggle" class="btn small primary">
+                  ▶ Start
+                </button>
+                <button id="billiard-reset" class="btn small ghost">
+                  Reset path
+                </button>
+              </div>
+            </div>
           </div>
-          <p style="font-size: 0.95rem;">The unstable classical orbit underlying the scar. A particle following this path returns to itself periodically.</p>
+
+          <div class="billiard-explainer card">
+            <h3>What this is actually showing</h3>
+            <ul class="bullets">
+              <li>
+                The particle moves in straight lines and reflects off the walls
+                like a laser on mirrors.
+              </li>
+              <li>
+                With <strong>roughness = 0</strong>, reflections are perfectly
+                clean, and the path is regular.
+              </li>
+              <li>
+                As you <strong>increase roughness</strong>, each bounce gets a
+                tiny random nudge. Those tiny changes accumulate and the path
+                becomes scrambled.
+              </li>
+            </ul>
+            <p class="muted">
+              In a real ion trap, “roughness” could correspond to microscopic
+              surface defects and patch potentials. The math tools we use for
+              billiards (Lyapunov exponents, monodromy matrices) tell us how
+              sensitive the system is to those imperfections.
+            </p>
+          </div>
         </div>
       </div>
-      
-      <div class="info-card">
-        <h3>Why Is This Shocking?</h3>
-        <p><strong>Unstable orbits should be invisible:</strong> In classical chaos, these periodic orbits occupy zero volume in phase space. A tiny perturbation and the particle flies off the orbit. They should have no impact on the quantum system's long-term behavior.</p>
-        <p><strong>But quantum mechanics disagrees:</strong> Wave interference allows the quantum particle to "feel" the orbit and concentrate probability there. It's as if the quantum wavefunction is scarred by the ghost of an unstable classical trajectory.</p>
-      </div>
+    </section>
 
-      <div class="info-card">
-        <h3>Direct Visualization (2024)</h3>
-        <p>For 40 years, scars were observed indirectly through simulations. In 2024, researchers finally directly visualized quantum scars in graphene quantum dots using scanning tunneling microscopy, actually seeing the enhanced probability density along periodic orbits in a real solid-state system!</p>
+    <!-- THESIS SECTION -->
+    <section id="thesis" class="section">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>My thesis in one picture and a few sentences</h2>
+          <p>
+            The short version: I use <strong>non-standard billiards</strong>
+            as a clean mathematical playground to study how small geometric
+            imperfections can lead to <strong>chaotic amplification</strong>,
+            and then connect that behavior to
+            <strong>anomalous heating in trapped-ion quantum computers</strong>.
+          </p>
+        </header>
+
+        <div class="thesis-grid">
+          <article class="card thesis-card">
+            <h3>1. Non-standard billiards</h3>
+            <p>
+              Instead of nice, symmetric tables, I look at:
+            </p>
+            <ul class="bullets">
+              <li>Billiards with gravity</li>
+              <li>Micro-structured or “rough” walls</li>
+              <li>Weird aspect ratios and shapes</li>
+            </ul>
+            <p class="muted">
+              These aren’t just pretty pictures — they push us into regimes
+              where standard textbook theory doesn’t cover everything.
+            </p>
+          </article>
+
+          <article class="card thesis-card">
+            <h3>2. Stability &amp; chaos</h3>
+            <p>
+              I study how trajectories behave using:
+            </p>
+            <ul class="bullets">
+              <li>Monodromy matrices</li>
+              <li>Lyapunov exponents</li>
+              <li>Curvature and differential geometry</li>
+            </ul>
+            <p class="muted">
+              The key object: how nearby trajectories separate or stay close
+              when you follow them around periodic orbits.
+            </p>
+          </article>
+
+          <article class="card thesis-card">
+            <h3>3. Connection to ion traps</h3>
+            <p>
+              Trapped ions can “heat up” due to uncontrolled
+              electric-field noise from surfaces. I look at how the
+              <strong>geometry of the system</strong> controls the
+              sensitivity to those disturbances.
+            </p>
+            <p class="muted">
+              Billiards give a mathematically precise way to ask:
+              “If I change this geometric feature, how does stability change?”
+            </p>
+          </article>
+        </div>
+
+        <div class="info-strip">
+          <p>
+            One line summary:
+            <strong>
+              Geometry → dynamics → chaos → noise.  
+              Use billiards to understand where quantum hardware is fragile —
+              and how to make it more robust.
+            </strong>
+          </p>
+        </div>
       </div>
+    </section>
+
+    <!-- WHY IT MATTERS -->
+    <section id="why" class="section section-alt">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Why this matters (and why you should care)</h2>
+          <p>
+            This isn’t just a math puzzle. If we understand how geometry and
+            chaos control noise, we can design <strong>better quantum
+            devices</strong>.
+          </p>
+        </header>
+
+        <div class="cards-grid">
+          <article class="card">
+            <h3>Better intuition for noise</h3>
+            <p>
+              Noise in quantum devices is often treated as a black box.
+              Billiards let us build <em>geometric intuition</em> for when
+              instability and heating will appear.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Design rules for hardware</h3>
+            <p>
+              If certain shapes and configurations are inherently more stable,
+              that’s a design rule. We can use math to rule out bad geometries
+              before spending time and money in the lab.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Cross-disciplinary playground</h3>
+            <p>
+              This project sits at the intersection of
+              <strong>math, physics, CS, and stats</strong>. There is room for
+              simulations, proofs, data analysis, and software.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHOOSE YOUR PATH -->
+    <section id="paths" class="section">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Choose your path into quantum &amp; chaos</h2>
+          <p>
+            Click the button that sounds most like you, and I’ll show a
+            possible way into this research space.
+          </p>
+        </header>
+
+        <div class="paths-layout">
+          <div class="card">
+            <div class="path-buttons">
+              <button class="btn pill path-btn" data-path="math">
+                I’m a math brain 🧮
+              </button>
+              <button class="btn pill path-btn" data-path="cs">
+                I’m a coder 🧑‍💻
+              </button>
+              <button class="btn pill path-btn" data-path="physics">
+                I’m a physics / ECE person ⚡
+              </button>
+              <button class="btn pill path-btn" data-path="curious">
+                I’m just curious 👀
+              </button>
+            </div>
+            <div id="path-output" class="path-output">
+              <p class="muted">
+                Tap one of the buttons above to see a possible path into
+                quantum &amp; chaos from your background.
+              </p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>What students can actually do</h3>
+            <ul class="bullets">
+              <li>Build and analyze toy simulations (like the one above)</li>
+              <li>Help with numerical experiments on exotic billiards</li>
+              <li>Explore data from trapped-ion experiments</li>
+              <li>Work on visualizations, web tools, and documentation</li>
+              <li>Help bridge math, physics, and CS for new students</li>
+            </ul>
+            <p class="muted">
+              If you’ve ever wondered “how does this abstract math
+              actually show up in hardware?”, this is a place where the
+              connection is very real.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MINI QUIZ -->
+    <section id="quiz" class="section section-alt">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Quick reality check: tiny quantum quiz</h2>
+          <p>
+            Click “Show answer” and argue with your friends later.
+          </p>
+        </header>
+
+        <div class="cards-grid quiz-grid">
+          <article class="card quiz-card">
+            <h3>Q1. Do quantum computers replace all classical computers?</h3>
+            <p>
+              A) Yes, they’re strictly more powerful  
+              B) No, they’re good for specific types of problems  
+              C) They’re literally magic
+            </p>
+            <button class="btn small reveal-answer">Show answer</button>
+            <p class="quiz-answer muted">
+              Mostly B. Quantum computers are powerful for certain structured
+              problems (like factoring, some simulation tasks), but classical
+              computers are not going anywhere. They complement each other.
+            </p>
+          </article>
+
+          <article class="card quiz-card">
+            <h3>Q2. Is chaos the same as randomness?</h3>
+            <p>
+              A) Yes  
+              B) No, chaos is deterministic but sensitive  
+              C) Only at full moon
+            </p>
+            <button class="btn small reveal-answer">Show answer</button>
+            <p class="quiz-answer muted">
+              B. Chaotic systems follow precise rules, but tiny differences
+              in initial conditions explode over time. That’s different from
+              pure randomness.
+            </p>
+          </article>
+
+          <article class="card quiz-card">
+            <h3>Q3. Why care about tiny geometric imperfections?</h3>
+            <p>
+              A) They’re aesthetic only  
+              B) They can drastically change stability and heating  
+              C) They only matter in pure math
+            </p>
+            <button class="btn small reveal-answer">Show answer</button>
+            <p class="quiz-answer muted">
+              B. In both billiards and trapped ions, small geometric
+              imperfections can be the difference between stable and
+              noisy behavior.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALL TO ACTION -->
+    <section id="cta" class="section">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Want to work on this (or something nearby)?</h2>
+          <p>
+            This project lives at the intersection of geometry, dynamical
+            systems, quantum information, and hardware. If you’re at a
+            university and any of those words spark joy, you can absolutely
+            contribute.
+          </p>
+        </header>
+
+        <div class="cta-grid">
+          <article class="card">
+            <h3>1. Students at my university</h3>
+            <p>
+              If you’re at UMass (or nearby), there are options:
+            </p>
+            <ul class="bullets">
+              <li>Independent study / reading course</li>
+              <li>Honors thesis / senior project</li>
+              <li>Side-project research (simulations, notes, visualizations)</li>
+            </ul>
+            <p>
+              👉 <a href="mailto:your.email@umass.edu" class="link-underline"
+                >Email me</a
+              >
+              with a short note about your background + what excites you.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>2. Not at my school?</h3>
+            <p>
+              You can still:
+            </p>
+            <ul class="bullets">
+              <li>Fork this site and adapt it to your own project</li>
+              <li>Start by learning the basics (see sources below)</li>
+              <li>Build your own simulations and share them</li>
+            </ul>
+            <p class="muted">
+              The demand for people who understand both math and quantum
+              hardware is only going up.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOURCES -->
+    <section id="sources" class="section section-alt">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Sources &amp; further reading</h2>
+          <p>
+            A short, non-exhaustive list of places to go deeper. Replace or
+            expand these with your favorite texts.
+          </p>
+        </header>
+
+        <div class="cards-grid">
+          <article class="card">
+            <h3>Quantum basics</h3>
+            <ul class="bullets">
+              <li>
+                <a href="https://quantum.country" target="_blank" rel="noreferrer"
+                  >Quantum Country: Quantum Computing for the Very Curious</a
+                >
+              </li>
+              <li>
+                Nielsen &amp; Chuang, <em>Quantum Computation and Quantum
+                Information</em>
+              </li>
+              <li>
+                Any intro quantum computing course from your university or
+                online platforms.
+              </li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Billiards &amp; chaos</h3>
+            <ul class="bullets">
+              <li>
+                Gutzwiller, <em>Chaos in Classical and Quantum Mechanics</em>
+              </li>
+              <li>
+                Chernov &amp; Markarian, <em>Chaotic Billiards</em>
+              </li>
+              <li>
+                Survey articles on dynamical systems and billiards (many are
+                freely available on arXiv).
+              </li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>Trapped ions &amp; anomalous heating</h3>
+            <ul class="bullets">
+              <li>
+                Review articles on trapped-ion quantum computing (e.g. Wineland
+                et al.).
+              </li>
+              <li>
+                Papers on electric-field noise and anomalous heating near
+                surfaces.
+              </li>
+              <li>
+                Your local university’s AMO / ion-trap group webpages and
+                theses.
+              </li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="section-inner footer-inner">
+      <p>
+        Built as part of an undergraduate thesis on billiards, chaos, and
+        trapped-ion noise. Feel free to fork and remix.
+      </p>
+      <p class="muted small">
+        Theme: dark/light mode, monospaced aesthetic, and minimal JS. Hosted
+        on GitHub Pages.
+      </p>
     </div>
-  </section>
+  </footer>
 
-  <!-- Why It Happens -->
-  <section id="explanation">
-    <div class="container">
-      <h2>Step 4: Why Do Quantum Scars Exist?</h2>
-      
-      <p>Quantum scars arise from a beautiful interplay between classical mechanics and quantum interference:</p>
-      
-      <div class="two-column">
-        <div class="info-card">
-          <h3>1. Classical Structure</h3>
-          <p>Even in chaos, there exist special <strong>periodic orbits</strong>, closed paths that a classical particle can follow. These orbits are unstable (nearby trajectories diverge exponentially), but they exist and form a dense skeleton in phase space.</p>
-        </div>
-        
-        <div class="info-card">
-          <h3>2. Quantum Interference</h3>
-          <p>Quantum particles are waves. When many quantum paths pass near a periodic orbit, they can <strong>interfere constructively</strong>. The result: enhanced probability density along the orbit, a scar!</p>
-        </div>
-      </div>
-
-      <div class="highlight">
-        <p><strong>The Mechanism (Heller's Linear Theory):</strong> Launch a Gaussian wave packet along a periodic orbit. It spreads as it evolves, but returns close to itself after one period. If the spreading is moderate (orbit not too unstable), repeated returns lead to constructive interference, building up probability density, a scar, in certain eigenstates.</p>
-      </div>
-
-      <div class="info-card">
-        <h3>Mathematical Beauty: The Gutzwiller Trace Formula</h3>
-        <p>The Gutzwiller trace formula connects quantum energy levels to classical periodic orbits. Each periodic orbit contributes a wave to the quantum density of states. Scars occur when these contributions align in phase for specific eigenstates, creating localized enhancements.</p>
-      </div>
-
-      <div class="info-card">
-        <h3>How Strong Are Scars?</h3>
-        <p>Not all periodic orbits create equally strong scars. Strong scars appear when:</p>
-        <ul>
-          <li>The orbit is <strong>moderately unstable</strong> (not too stable, not too unstable)</li>
-          <li>The orbit is <strong>relatively short</strong> (shorter period = stronger effect)</li>
-          <li>The quantum energy aligns with the orbit's properties</li>
-        </ul>
-        <p>The scar strength scales as e^(-λT/2), where λ is the Lyapunov exponent (instability) and T is the period.</p>
-      </div>
-
-      <div class="info-card">
-        <h3>Trapped Ions: Engineering Scars</h3>
-        <p><strong>Here's where it gets exciting for quantum technology:</strong> In trapped ion systems, we can <strong>engineer the trap geometry</strong> to control which periodic orbits exist! By designing trap potentials, we can:</p>
-        <ul>
-          <li>Choose which scars appear by selecting trap shapes</li>
-          <li>Tune scar strength by adjusting anharmonicity</li>
-          <li>Protect qubits by localizing quantum information in scarred states</li>
-        </ul>
-        <p>This is active area of research, using scars as a resource, not just a curiosity!</p>
-      </div>
-    </div>
-  </section>
-
-  
-
-  <!-- Applications -->
-  <section id="applications">
-    <div class="container">
-      <h2>Step 5: Many-Body Scars & Trapped Ion Quantum Computing</h2>
-      
-      <p>The story takes a dramatic turn in 2017-2018 with the discovery of <strong>many-body quantum scars</strong> in Rydberg atom experiments and their prediction in trapped ion systems...</p>
-
-      <div class="info-card">
-        <h3>🔬 The 2017-2018 Breakthrough</h3>
-        <p>Researchers at Harvard and MIT prepared 51 Rydberg atoms in a specific pattern and watched them evolve. <strong>Expected:</strong> rapid thermalization (scrambling of quantum information). <strong>Observed:</strong> persistent oscillations lasting much longer than expected, the system refused to thermalize!</p>
-        <p>The cause? <strong>Many-body quantum scars</strong>, a few special eigenstates embedded in an otherwise thermal spectrum that prevent thermalization when the system is initialized on them.</p>
-      </div>
-
-      <div class="highlight">
-        <p><strong>The Connection to Single-Particle Scars:</strong> Many-body scars follow the same principle: enhanced probability along unstable periodic orbits, but now in the many-body phase space. The system "scars" around collective excitation patterns.</p>
-      </div>
-
-      <div class="info-card">
-        <h3>⚛️ Trapped Ions: The Perfect Platform</h3>
-        <p><strong>Why trapped ions are ideal for studying and using quantum scars:</strong></p>
-        <ul>
-          <li><strong>Tunable geometry:</strong> Trap shapes are programmable, we can engineer which periodic orbits (and thus scars) exist</li>
-          <li><strong>Long coherence:</strong> Ions are well-isolated, allowing scars to persist</li>
-          <li><strong>Precise control:</strong> We can initialize on specific scarred states</li>
-          <li><strong>All-to-all interactions:</strong> Trapped ions naturally have long-range interactions, similar to Rydberg atoms where many-body scars were discovered</li>
-        </ul>
-      </div>
-
-      <div class="info-card">
-        <h3>💻 Application 1: Protecting Quantum Information</h3>
-        <p><strong>The Problem:</strong> Decoherence destroys quantum information as systems thermalize and entangle with their environment.</p>
-        <p><strong>The Opportunity:</strong> Scarred states resist thermalization! If we encode quantum information in many-body scarred states:</p>
-        <ul>
-          <li>Information stays localized longer (weak ergodicity breaking)</li>
-          <li>Quantum coherence persists despite interactions</li>
-          <li>Potential for "self-protecting" qubit encodings</li>
-        </ul>
-        <p><strong>Current research:</strong> Designing trap geometries that maximize scar lifetimes while maintaining computational universality.</p>
-      </div>
-
-      <div class="info-card">
-        <h3>🎯 Application 2: Quantum Simulation</h3>
-        <p>Trapped ion quantum simulators can probe many-body scars in regimes impossible for classical computers:</p>
-        <ul>
-          <li>Test theories of thermalization and ergodicity breaking</li>
-          <li>Study quantum-classical correspondence at the many-body level</li>
-          <li>Explore connections to other non-thermal phenomena (MBL, quantum time crystals)</li>
-        </ul>
-      </div>
-
-      <div class="info-card">
-        <h3>⚡ Application 3: Trapped Ion Hardware Design</h3>
-        <p><strong>Practical implications for ion trap quantum computers:</strong></p>
-        <ul>
-          <li><strong>Gate fidelity:</strong> Understanding scars helps predict where quantum states localize during gates</li>
-          <li><strong>Crosstalk:</strong> Scarred states may reduce unwanted interactions between qubits</li>
-          <li><strong>Initialization:</strong> Using scarred states as initial conditions for quantum algorithms</li>
-          <li><strong>Error correction:</strong> Scar-based logical qubit encodings with built-in protection</li>
-        </ul>
-      </div>
-
-      <div class="highlight">
-        <p><strong>Recent Results (2024-2025):</strong> Multiple groups have demonstrated robust many-body scars in long-range interacting spin systems, exactly the regime of trapped ions! The field is moving from "Can we observe scars?" to "How do we use scars?"</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Call to Action -->
-  <section id="cta">
-    <div class="container">
-      <h2>The Future of Quantum Scars in Trapped Ions</h2>
-      
-      <p style="text-align: center; font-size: 1.2rem; margin-bottom: 2rem;">This is a young field where fundamental physics meets cutting-edge quantum technology. Trapped ions are at the center of this revolution.</p>
-
-      <div class="two-column">
-        <div class="info-card">
-          <h3>🔬 For Experimentalists</h3>
-          <p>Design trap geometries to engineer desired scars. Measure scar dynamics and lifetimes. Test theoretical predictions of many-body scarring in long-range interacting systems. Explore scar-based quantum error correction.</p>
-        </div>
-        
-        <div class="info-card">
-          <h3>💻 For Theorists</h3>
-          <p>Develop semiclassical theories for many-body scars. Predict optimal trap geometries. Connect scars to other non-equilibrium phenomena. Explore quantum information scrambling in scarred systems.</p>
-        </div>
-        
-        <div class="info-card">
-          <h3>🧮 For Computational Scientists</h3>
-          <p>Simulate large ion systems to find scars. Optimize trap designs. Develop machine learning tools to identify scarred states. Calculate fidelities for scar-based quantum gates.</p>
-        </div>
-        
-        <div class="info-card">
-          <h3>⚙️ For Quantum Engineers</h3>
-          <p>Implement scar-based protocols in real ion trap hardware. Integrate with existing quantum computing architectures. Design new trap geometries based on scar principles. Benchmark performance gains.</p>
-        </div>
-      </div>
-
-      <div style="text-align: center; margin-top: 3rem;">
-        <h3>Essential Reading</h3>
-        <p style="margin-bottom: 1rem;">Start your journey:</p>
-        <div class="controls" style="flex-direction: column;">
-          <a href="https://link.aps.org/doi/10.1103/PhysRevLett.53.1515" target="_blank" class="btn">Heller 1984: Original Scars Paper</a>
-          <a href="https://arxiv.org/abs/2011.09486" target="_blank" class="btn">Many-Body Scars Review (2020)</a>
-          <a href="https://www.nature.com/articles/s41467-025-61765-3" target="_blank" class="btn">Genuine Scars in Many-Body Systems (2025)</a>
-          <a href="https://journals.aps.org/rmp/abstract/10.1103/RevModPhys.93.025001" target="_blank" class="btn btn-secondary">Trapped Ion Quantum Simulation Review</a>
-        </div>
-      </div>
-
-      <div class="highlight" style="margin-top: 3rem; text-align: center;">
-        <p><strong>The Story Continues...</strong></p>
-        <p>Quantum scars bridge classical and quantum mechanics, connect fundamental physics to quantum technology, and may hold the key to more robust quantum computers. In trapped ion systems, we have unprecedented control to explore, understand, and exploit these remarkable quantum phenomena.</p>
-        <p style="margin-top: 1rem;"><em>Every scarred eigenstate is a window into how nature negotiates between chaos and order at the quantum level. What will you discover?</em></p>
-      </div>
-    </div>
-  </section>
-
-  <script>
-    // Progress bar and navigation
-    function updateProgress() {
-      const scroll = window.scrollY;
-      const height = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (scroll / height) * 100;
-      document.getElementById('progressBar').style.width = progress + '%';
-    }
-
-    window.addEventListener('scroll', updateProgress);
-
-    const sections = document.querySelectorAll('section');
-    const observerOptions = { threshold: 0.2, rootMargin: '0px' };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          const index = Array.from(sections).indexOf(entry.target);
-          document.querySelectorAll('.nav-dot').forEach((dot, i) => {
-            dot.classList.toggle('active', i === index);
-          });
-        }
-      });
-    }, observerOptions);
-
-    sections.forEach(section => observer.observe(section));
-
-    document.querySelectorAll('.nav-dot').forEach((dot, index) => {
-      dot.addEventListener('click', () => {
-        sections[index].scrollIntoView({ behavior: 'smooth' });
-      });
-    });
-
-    // === VISUALIZATION CANVASES ===
-    function drawUniform() {
-      const canvas = document.getElementById('uniformCanvas');
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width, h = canvas.height;
-      
-      ctx.fillStyle = '#0a0e17';
-      ctx.fillRect(0, 0, w, h);
-      
-      // Stadium shape
-      const cx = w/2, cy = h/2, rx = 150, ry = 60;
-      ctx.strokeStyle = '#ffd166';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(cx - rx/2, cy, ry, Math.PI/2, -Math.PI/2);
-      ctx.lineTo(cx + rx/2, cy - ry);
-      ctx.arc(cx + rx/2, cy, ry, -Math.PI/2, Math.PI/2);
-      ctx.lineTo(cx - rx/2, cy + ry);
-      ctx.stroke();
-      
-      // Uniform noise
-      const imageData = ctx.getImageData(0, 0, w, h);
-      const data = imageData.data;
-      for (let i = 0; i < data.length; i += 4) {
-        const x = (i / 4) % w;
-        const y = Math.floor((i / 4) / w);
-        const dx = x - cx, dy = y - cy;
-        
-        let inside = false;
-        if (Math.abs(dx) <= rx/2) {
-          inside = Math.abs(dy) <= ry;
-        } else {
-          const cdx = dx - Math.sign(dx) * rx/2;
-          inside = cdx*cdx + dy*dy <= ry*ry;
-        }
-        
-        if (inside) {
-          const intensity = 100 + Math.random() * 100;
-          data[i] = intensity * 0.6;
-          data[i+1] = intensity * 0.6;
-          data[i+2] = intensity;
-          data[i+3] = 180;
-        }
-      }
-      ctx.putImageData(imageData, 0, 0);
-      
-      // Redraw border
-      ctx.strokeStyle = '#ffd166';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(cx - rx/2, cy, ry, Math.PI/2, -Math.PI/2);
-      ctx.lineTo(cx + rx/2, cy - ry);
-      ctx.arc(cx + rx/2, cy, ry, -Math.PI/2, Math.PI/2);
-      ctx.lineTo(cx - rx/2, cy + ry);
-      ctx.stroke();
-    }
-
-    function drawTypical() {
-      const canvas = document.getElementById('typicalCanvas');
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width, h = canvas.height;
-      
-      ctx.fillStyle = '#0a0e17';
-      ctx.fillRect(0, 0, w, h);
-      
-      const cx = w/2, cy = h/2, rx = 150, ry = 60;
-      
-      // Random wave superposition
-      const imageData = ctx.getImageData(0, 0, w, h);
-      const data = imageData.data;
-      for (let i = 0; i < data.length; i += 4) {
-        const x = (i / 4) % w;
-        const y = Math.floor((i / 4) / w);
-        const dx = x - cx, dy = y - cy;
-        
-        let inside = false;
-        if (Math.abs(dx) <= rx/2) {
-          inside = Math.abs(dy) <= ry;
-        } else {
-          const cdx = dx - Math.sign(dx) * rx/2;
-          inside = cdx*cdx + dy*dy <= ry*ry;
-        }
-        
-        if (inside) {
-          let val = 0;
-          for (let k = 0; k < 8; k++) {
-            const kx = (Math.random() - 0.5) * 0.05;
-            const ky = (Math.random() - 0.5) * 0.05;
-            val += Math.sin(kx * dx + ky * dy + Math.random() * Math.PI * 2);
-          }
-          const intensity = 100 + val * 20;
-          data[i] = intensity * 0.6;
-          data[i+1] = intensity * 0.6;
-          data[i+2] = intensity;
-          data[i+3] = 180;
-        }
-      }
-      ctx.putImageData(imageData, 0, 0);
-      
-      ctx.strokeStyle = '#ffd166';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(cx - rx/2, cy, ry, Math.PI/2, -Math.PI/2);
-      ctx.lineTo(cx + rx/2, cy - ry);
-      ctx.arc(cx + rx/2, cy, ry, -Math.PI/2, Math.PI/2);
-      ctx.lineTo(cx - rx/2, cy + ry);
-      ctx.stroke();
-    }
-
-    function drawScar() {
-      const canvas = document.getElementById('scarCanvas');
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width, h = canvas.height;
-      
-      ctx.fillStyle = '#0a0e17';
-      ctx.fillRect(0, 0, w, h);
-      
-      const cx = w/2, cy = h/2, rx = 150, ry = 60;
-      
-      // Background + scar along horizontal orbit
-      const imageData = ctx.getImageData(0, 0, w, h);
-      const data = imageData.data;
-      for (let i = 0; i < data.length; i += 4) {
-        const x = (i / 4) % w;
-        const y = Math.floor((i / 4) / w);
-        const dx = x - cx, dy = y - cy;
-        
-        let inside = false;
-        if (Math.abs(dx) <= rx/2) {
-          inside = Math.abs(dy) <= ry;
-        } else {
-          const cdx = dx - Math.sign(dx) * rx/2;
-          inside = cdx*cdx + dy*dy <= ry*ry;
-        }
-        
-        if (inside) {
-          // Background
-          let intensity = 50 + Math.random() * 30;
-          
-          // Scar enhancement along horizontal line
-          const distToOrbit = Math.abs(dy);
-          if (distToOrbit < 15) {
-            intensity += (15 - distToOrbit) * 12;
-          }
-          
-          data[i] = intensity * 0.8;
-          data[i+1] = intensity * 0.7;
-          data[i+2] = intensity;
-          data[i+3] = 200;
-        }
-      }
-      ctx.putImageData(imageData, 0, 0);
-      
-      ctx.strokeStyle = '#ffd166';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(cx - rx/2, cy, ry, Math.PI/2, -Math.PI/2);
-      ctx.lineTo(cx + rx/2, cy - ry);
-      ctx.arc(cx + rx/2, cy, ry, -Math.PI/2, Math.PI/2);
-      ctx.lineTo(cx - rx/2, cy + ry);
-      ctx.stroke();
-      
-      // Highlight the scar
-      ctx.strokeStyle = 'rgba(255, 209, 102, 0.6)';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(cx - rx/2, cy);
-      ctx.lineTo(cx + rx/2, cy);
-      ctx.stroke();
-    }
-
-    function drawOrbit() {
-      const canvas = document.getElementById('orbitCanvas');
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width, h = canvas.height;
-      
-      ctx.fillStyle = '#0a0e17';
-      ctx.fillRect(0, 0, w, h);
-      
-      const cx = w/2, cy = h/2, rx = 150, ry = 60;
-      
-      // Stadium outline
-      ctx.strokeStyle = '#1e2936';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(cx - rx/2, cy, ry, Math.PI/2, -Math.PI/2);
-      ctx.lineTo(cx + rx/2, cy - ry);
-      ctx.arc(cx + rx/2, cy, ry, -Math.PI/2, Math.PI/2);
-      ctx.lineTo(cx - rx/2, cy + ry);
-      ctx.stroke();
-      
-      // Periodic orbit
-      ctx.strokeStyle = '#ffd166';
-      ctx.lineWidth = 3;
-      ctx.setLineDash([5, 5]);
-      ctx.beginPath();
-      ctx.moveTo(cx - rx/2 + 10, cy);
-      ctx.lineTo(cx + rx/2 - 10, cy);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      
-      // Arrows
-      ctx.fillStyle = '#ffd166';
-      const arrowSize = 8;
-      ctx.beginPath();
-      ctx.moveTo(cx + rx/2 - 15, cy);
-      ctx.lineTo(cx + rx/2 - 15 - arrowSize, cy - arrowSize/2);
-      ctx.lineTo(cx + rx/2 - 15 - arrowSize, cy + arrowSize/2);
-      ctx.fill();
-      
-      ctx.beginPath();
-      ctx.moveTo(cx - rx/2 + 15, cy);
-      ctx.lineTo(cx - rx/2 + 15 + arrowSize, cy - arrowSize/2);
-      ctx.lineTo(cx - rx/2 + 15 + arrowSize, cy + arrowSize/2);
-      ctx.fill();
-      
-      ctx.font = '14px sans-serif';
-      ctx.fillStyle = '#ffd166';
-      ctx.textAlign = 'center';
-      ctx.fillText('Unstable Periodic Orbit', cx, cy + ry + 40);
-    }
-
-    // Initialize visualizations
-    if (document.getElementById('uniformCanvas')) {
-      window.addEventListener('load', () => {
-        drawUniform();
-        drawTypical();
-        drawScar();
-        drawOrbit();
-      });
-    }
-
-    // === CHAOS CANVAS ===
-    const chaosCanvas = document.getElementById('chaosCanvas');
-    const chaosCtx = chaosCanvas.getContext('2d');
-    let chaosParticles = [];
-    let chaosRunning = true;
-    let chaosAnimationId;
-
-    function resizeChaos() {
-      const container = chaosCanvas.parentElement;
-      const dpr = window.devicePixelRatio || 1;
-      chaosCanvas.width = container.clientWidth * dpr;
-      chaosCanvas.height = container.clientHeight * dpr;
-      chaosCanvas.style.width = container.clientWidth + 'px';
-      chaosCanvas.style.height = container.clientHeight + 'px';
-      chaosCtx.scale(dpr, dpr);
-    }
-
-    class Particle {
-      constructor(x, y, color) {
-        this.x = x;
-        this.y = y;
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 3 + Math.random() * 2;
-        this.vx = Math.cos(angle) * speed;
-        this.vy = Math.sin(angle) * speed;
-        this.color = color;
-        this.trail = [];
-        this.maxTrail = 80;
-      }
-
-      update() {
-        this.trail.push({ x: this.x, y: this.y });
-        if (this.trail.length > this.maxTrail) this.trail.shift();
-
-        this.x += this.vx;
-        this.y += this.vy;
-
-        const w = chaosCanvas.clientWidth;
-        const h = chaosCanvas.clientHeight;
-        const margin = 50;
-
-        if (this.x < margin || this.x > w - margin) {
-          this.vx *= -0.98;
-          this.x = Math.max(margin, Math.min(w - margin, this.x));
-        }
-        if (this.y < margin || this.y > h - margin) {
-          this.vy *= -0.98;
-          this.y = Math.max(margin, Math.min(h - margin, this.y));
-        }
-
-        this.vx += (Math.random() - 0.5) * 0.1;
-        this.vy += (Math.random() - 0.5) * 0.1;
-      }
-
-      draw() {
-        chaosCtx.strokeStyle = this.color;
-        chaosCtx.lineWidth = 1.5;
-        chaosCtx.globalAlpha = 0.6;
-        chaosCtx.beginPath();
-        for (let i = 0; i < this.trail.length - 1; i++) {
-          chaosCtx.moveTo(this.trail[i].x, this.trail[i].y);
-          chaosCtx.lineTo(this.trail[i + 1].x, this.trail[i + 1].y);
-        }
-        chaosCtx.stroke();
-
-        chaosCtx.globalAlpha = 1;
-        chaosCtx.fillStyle = this.color;
-        chaosCtx.beginPath();
-        chaosCtx.arc(this.x, this.y, 4, 0, Math.PI * 2);
-        chaosCtx.fill();
-      }
-    }
-
-    function animateChaos() {
-      if (!chaosRunning) {
-        chaosAnimationId = null;
-        return;
-      }
-
-      const w = chaosCanvas.clientWidth;
-      const h = chaosCanvas.clientHeight;
-
-      chaosCtx.fillStyle = 'rgba(19, 24, 32, 0.1)';
-      chaosCtx.fillRect(0, 0, w, h);
-
-      chaosParticles.forEach(p => {
-        p.update();
-        p.draw();
-      });
-
-      chaosAnimationId = requestAnimationFrame(animateChaos);
-    }
-
-    chaosCanvas.addEventListener('click', (e) => {
-      const rect = chaosCanvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      const colors = ['#ffd166', '#06ffa5', '#ff6b6b'];
-      for (let i = 0; i < 3; i++) {
-        chaosParticles.push(new Particle(x + i * 2, y + i * 2, colors[i]));
-      }
-      
-      if (!chaosAnimationId) {
-        chaosRunning = true;
-        animateChaos();
-      }
-    });
-
-    function resetChaos() {
-      chaosParticles = [];
-      chaosCtx.fillStyle = '#131820';
-      chaosCtx.fillRect(0, 0, chaosCanvas.clientWidth, chaosCanvas.clientHeight);
-    }
-
-    function toggleChaos() {
-      chaosRunning = !chaosRunning;
-      if (chaosRunning && !chaosAnimationId) animateChaos();
-    }
-
-    // === DOUBLE PENDULUM ===
-    const dpCanvas = document.getElementById('dpCanvas');
-    const dpCtx = dpCanvas.getContext('2d');
-    
-    let stateA = [1.0, 1.05, 0, 0];
-    let stateB = [1.0005, 1.0505, 0, 0];
-    let simSpeed = 2.5;
-    let trailMax = 300;
-    let running = false;
-    let last = performance.now();
-    let pathA = [];
-    let pathB = [];
-    
-    const m1 = 1, m2 = 1;
-    let l1 = 160, l2 = 160;
-    const g = 20.0;
-
-    function resizeDP() {
-      const container = dpCanvas.parentElement;
-      const dpr = window.devicePixelRatio || 1;
-      dpCanvas.width = container.clientWidth * dpr;
-      dpCanvas.height = container.clientHeight * dpr;
-      dpCanvas.style.width = container.clientWidth + 'px';
-      dpCanvas.style.height = container.clientHeight + 'px';
-      dpCtx.scale(dpr, dpr);
-    }
-
-    function deriv(s) {
-      const [t1, t2, w1, w2] = s;
-      const d = 2 * m1 + m2 - m2 * Math.cos(2 * t1 - 2 * t2);
-      const dw1 = (-g * (2 * m1 + m2) * Math.sin(t1) - m2 * g * Math.sin(t1 - 2 * t2) - 
-                   2 * Math.sin(t1 - t2) * m2 * (w2 * w2 * l2 + w1 * w1 * l1 * Math.cos(t1 - t2))) / (l1 * d);
-      const dw2 = (2 * Math.sin(t1 - t2) * (w1 * w1 * l1 * (m1 + m2) + g * (m1 + m2) * Math.cos(t1) + 
-                   w2 * w2 * l2 * m2 * Math.cos(t1 - t2))) / (l2 * d);
-      return [w1, w2, dw1, dw2];
-    }
-
-    function rk4(s, dt) {
-      const k1 = deriv(s);
-      const s2 = s.map((v, i) => v + k1[i] * dt / 2);
-      const k2 = deriv(s2);
-      const s3 = s.map((v, i) => v + k2[i] * dt / 2);
-      const k3 = deriv(s3);
-      const s4 = s.map((v, i) => v + k3[i] * dt);
-      const k4 = deriv(s4);
-      return s.map((v, i) => v + dt * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) / 6);
-    }
-
-    function step(dt) {
-      stateA = rk4(stateA, dt);
-      stateB = rk4(stateB, dt);
-    }
-
-    function drawDP() {
-      dpCtx.fillStyle = 'rgba(10, 14, 23, 0.15)';
-      dpCtx.fillRect(0, 0, dpCanvas.clientWidth, dpCanvas.clientHeight);
-
-      const W = dpCanvas.clientWidth;
-      const H = dpCanvas.clientHeight;
-      l1 = Math.min(W, H) * 0.22;
-      l2 = Math.min(W, H) * 0.22;
-
-      dpCtx.save();
-      dpCtx.translate(W / 2, H / 3);
-
-      function xyFromState(s) {
-        const [t1, t2] = s;
-        const x1 = l1 * Math.sin(t1);
-        const y1 = l1 * Math.cos(t1);
-        const x2 = x1 + l2 * Math.sin(t2);
-        const y2 = y1 + l2 * Math.cos(t2);
-        return { x1, y1, x2, y2 };
-      }
-
-      const pA = xyFromState(stateA);
-      const pB = xyFromState(stateB);
-      pathA.push({ x: pA.x2, y: pA.y2 });
-      if (pathA.length > trailMax) pathA.shift();
-      pathB.push({ x: pB.x2, y: pB.y2 });
-      if (pathB.length > trailMax) pathB.shift();
-
-      function drawTrail(path, r, g, b) {
-        if (path.length < 2) return;
-        dpCtx.lineWidth = 2;
-        for (let i = 1; i < path.length; i++) {
-          const a = i / path.length * 0.9;
-          dpCtx.beginPath();
-          dpCtx.strokeStyle = `rgba(${r},${g},${b},${a})`;
-          dpCtx.moveTo(path[i - 1].x, path[i - 1].y);
-          dpCtx.lineTo(path[i].x, path[i].y);
-          dpCtx.stroke();
-        }
-      }
-
-      drawTrail(pathB, 255, 151, 59);
-      drawTrail(pathA, 255, 209, 102);
-
-      function drawState(s, color, alpha) {
-        const [t1, t2] = s;
-        const x1 = l1 * Math.sin(t1);
-        const y1 = l1 * Math.cos(t1);
-        const x2 = x1 + l2 * Math.sin(t2);
-        const y2 = y1 + l2 * Math.cos(t2);
-        
-        dpCtx.globalAlpha = alpha;
-        dpCtx.beginPath();
-        dpCtx.lineWidth = 3;
-        dpCtx.strokeStyle = color;
-        dpCtx.moveTo(0, 0);
-        dpCtx.lineTo(x1, y1);
-        dpCtx.lineTo(x2, y2);
-        dpCtx.stroke();
-        
-        dpCtx.beginPath();
-        dpCtx.arc(x1, y1, 8, 0, Math.PI * 2);
-        dpCtx.fillStyle = color;
-        dpCtx.fill();
-        dpCtx.beginPath();
-        dpCtx.arc(x2, y2, 7, 0, Math.PI * 2);
-        dpCtx.fill();
-      }
-
-      drawState(stateB, 'rgba(255,151,59,0.85)', 0.95);
-      drawState(stateA, 'rgba(255,209,102,0.98)', 1.0);
-
-      dpCtx.restore();
-    }
-
-    function loopDP(t) {
-      const rawDt = (t - last) / 1000;
-      last = t;
-      const dt = Math.min(0.04, rawDt) * simSpeed;
-      
-      if (running) {
-        const steps = Math.max(1, Math.ceil(dt / 0.006));
-        const small = dt / steps;
-        for (let i = 0; i < steps; i++) step(small);
-      }
-      
-      drawDP();
-      requestAnimationFrame(loopDP);
-    }
-
-    document.getElementById('playBtn').addEventListener('click', () => {
-      running = !running;
-      document.getElementById('playBtn').textContent = running ? 'Pause' : 'Play';
-    });
-
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      const a1Val = parseFloat(document.getElementById('a1').value);
-      const a2Val = parseFloat(document.getElementById('a2').value);
-      stateA = [a1Val, a2Val, 0, 0];
-      stateB = [a1Val + 0.0005, a2Val + 0.0005, 0, 0];
-      running = false;
-      document.getElementById('playBtn').textContent = 'Play';
-      pathA = [];
-      pathB = [];
-    });
-
-    document.getElementById('a1').addEventListener('input', (e) => {
-      stateA[0] = parseFloat(e.target.value);
-      stateB[0] = parseFloat(e.target.value) + 0.0005;
-      pathA = [];
-      pathB = [];
-    });
-
-    document.getElementById('a2').addEventListener('input', (e) => {
-      stateA[1] = parseFloat(e.target.value);
-      stateB[1] = parseFloat(e.target.value) + 0.0005;
-      pathA = [];
-      pathB = [];
-    });
-
-    document.getElementById('speed').addEventListener('input', (e) => {
-      simSpeed = parseFloat(e.target.value);
-    });
-
-    document.getElementById('trailLen').addEventListener('input', (e) => {
-      trailMax = parseInt(e.target.value, 10);
-      if (pathA.length > trailMax) pathA = pathA.slice(-trailMax);
-      if (pathB.length > trailMax) pathB = pathB.slice(-trailMax);
-    });
-
-    // Initialize
-    window.addEventListener('load', () => {
-      resizeChaos();
-      resizeDP();
-      animateChaos();
-      requestAnimationFrame(loopDP);
-    });
-
-    window.addEventListener('resize', () => {
-      resizeChaos();
-      resizeDP();
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>

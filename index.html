@@ -9,7 +9,7 @@
     content="An interactive tour from bouncing balls (billiards) to quantum bits, chaos, and trapped-ion noise — and how you can get involved in research."
   />
 
-  <!-- Fonts: heading + mono body (Courier‑ish) -->
+  <!-- Fonts: heading + mono body (Courier-ish) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -17,8 +17,7 @@
     rel="stylesheet"
   />
 
-  <!-- NOTE: The original HTML referenced a non‑existent style.css file. -->
-  <!-- The stylesheet in this repository is named styles.css, so update the href accordingly. -->
+  <!-- Match the actual filename: styles.css -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -33,7 +32,6 @@
         <a href="#start">Start here</a>
         <a href="#billiards">Interactive demo</a>
         <a href="#thesis">My thesis</a>
-        <!-- Removed call‑to‑action link; the CTA section no longer exists -->
         <a href="#sources">Sources</a>
       </nav>
       <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
@@ -59,7 +57,6 @@
 
           <div class="hero-actions">
             <a href="#start" class="btn primary">Start with the basics ⬇</a>
-            <!-- Removed secondary CTA button to a deleted section -->
           </div>
 
           <p class="hero-tagline">
@@ -164,11 +161,12 @@
     <section id="billiards" class="section section-alt">
       <div class="section-inner">
         <header class="section-header">
-          <h2>Explore a double pendulum: chaotic motion in real time</h2>
+          <h2>Explore a noisy billiard: chaos from rough walls</h2>
           <p>
-            Watch how two connected pendulums swing in complex, seemingly
-            unpredictable patterns. Adjust the <strong>damping</strong> (a kind
-            of friction) to see how it affects the motion.
+            Below is a <strong>toy billiard</strong>: a point-like “ion”
+            bouncing in a rectangular trap. The slider controls how
+            <strong>rough / noisy</strong> the walls are. Even small roughness
+            can make the trajectory wander all over the table.
           </p>
         </header>
 
@@ -176,23 +174,23 @@
           <div class="billiard-canvas-wrap card">
             <div class="billiard-header">
               <span class="badge">Interactive</span>
-              <span class="billiard-label">Double pendulum demo</span>
+              <span class="billiard-label">Rough billiard demo</span>
             </div>
             <canvas id="billiard-canvas" width="480" height="360">
               Your browser doesn’t support canvas.
             </canvas>
             <div class="billiard-controls">
-              <label class="slider-label" for="damping">
-                Damping factor
-                <span id="damping-value">0.00</span>
+              <label class="slider-label" for="roughness">
+                Wall roughness / noise strength
+                <span id="roughness-value">0.20</span>
               </label>
               <input
-                id="damping"
+                id="roughness"
                 type="range"
                 min="0"
-                max="0.2"
-                step="0.005"
-                value="0"
+                max="1.2"
+                step="0.05"
+                value="0.2"
               />
               <div class="billiard-buttons">
                 <button id="billiard-toggle" class="btn small primary">
@@ -209,23 +207,24 @@
             <h3>What this is actually showing</h3>
             <ul class="bullets">
               <li>
-                Two pendulums are connected end‑to‑end. Their motion is coupled,
-                leading to rich, chaotic dynamics even with simple physics.
+                We launch a single “ray” (think: an ion’s trajectory) inside a
+                rectangular trap and let it bounce specularly off the walls.
               </li>
               <li>
-                With <strong>zero damping</strong>, energy is conserved and the
-                swings can be wild and long‑lasting.
+                With <strong>zero roughness</strong>, reflections are perfect:
+                the trajectory is structured and remembers its initial direction.
               </li>
               <li>
-                As you <strong>increase damping</strong>, friction slows things
-                down and the motion eventually settles.
+                As you <strong>increase roughness</strong>, each bounce picks up
+                a tiny random angle kick — like hitting a slightly rough or
+                micro-structured electrode.
               </li>
             </ul>
             <p class="muted">
-              The double pendulum is a classic example of deterministic chaos:
-              small changes in initial angles or friction lead to drastically
-              different trajectories. This illustrates why predicting noisy
-              systems — like ion traps — can be so challenging.
+              Over many bounces, those tiny kicks add up and the path starts to
+              look <strong>chaotic and space-filling</strong>. This is the same
+              story as anomalous heating: small geometric / surface features can
+              dramatically change stability and how energy is absorbed.
             </p>
           </div>
         </div>
@@ -416,8 +415,8 @@
           <article class="card quiz-card">
             <h3>Q1. Do quantum computers replace all classical computers?</h3>
             <p>
-              A) Yes, they’re strictly more powerful  
-              B) No, they’re good for specific types of problems  
+              A) Yes, they’re strictly more powerful<br />
+              B) No, they’re good for specific types of problems<br />
               C) They’re literally magic
             </p>
             <button class="btn small reveal-answer">Show answer</button>
@@ -431,8 +430,8 @@
           <article class="card quiz-card">
             <h3>Q2. Is chaos the same as randomness?</h3>
             <p>
-              A) Yes  
-              B) No, chaos is deterministic but sensitive  
+              A) Yes<br />
+              B) No, chaos is deterministic but sensitive<br />
               C) Only at full moon
             </p>
             <button class="btn small reveal-answer">Show answer</button>
@@ -446,8 +445,8 @@
           <article class="card quiz-card">
             <h3>Q3. Why care about tiny geometric imperfections?</h3>
             <p>
-              A) They’re aesthetic only  
-              B) They can drastically change stability and heating  
+              A) They’re aesthetic only<br />
+              B) They can drastically change stability and heating<br />
               C) They only matter in pure math
             </p>
             <button class="btn small reveal-answer">Show answer</button>
@@ -460,8 +459,6 @@
         </div>
       </div>
     </section>
-
-    <!-- Call‑to‑action section removed as per updated design -->
 
     <!-- SOURCES -->
     <section id="sources" class="section section-alt">
@@ -538,7 +535,6 @@
         Built as part of an undergraduate thesis on billiards, chaos, and
         trapped-ion noise. Feel free to fork and remix.
       </p>
-      <!-- Removed theme/footer tagline as requested -->
     </div>
   </footer>
 

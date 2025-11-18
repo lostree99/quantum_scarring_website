@@ -7,7 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeToggle = document.getElementById("theme-toggle");
 
   const storedTheme = localStorage.getItem("theme");
-  const prefersDark = window.matchMedia &&
+  const prefersDark =
+    window.matchMedia &&
     window.matchMedia("(prefers-color-scheme: dark)").matches;
 
   let currentTheme = storedTheme || (prefersDark ? "dark" : "light");
@@ -98,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========
-  // BILLIARD DEMO
+  // BILLIARD DEMO (ROUGH BILLIARD / WALL NOISE)
   // =========
 
   const canvas = document.getElementById("billiard-canvas");
@@ -117,26 +118,11 @@ document.addEventListener("DOMContentLoaded", () => {
     height: 0.6
   };
 
-  const initCanvasSize = () => {
-    if (!canvas) return;
-    const parentWidth = canvas.parentElement
-      ? canvas.parentElement.clientWidth
-      : 480;
-    const width = Math.min(parentWidth, 520);
-    const height = width * billiard.height;
-    canvas.width = width;
-    canvas.height = height;
-
-    ctx = canvas.getContext("2d");
-    clearCanvas();
-    resetBall();
-  };
-
   const clearCanvas = () => {
     if (!ctx || !canvas) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // subtle grid
+    // subtle grid as “trap background”
     ctx.save();
     ctx.strokeStyle = "rgba(148, 163, 184, 0.18)";
     ctx.lineWidth = 0.5;
@@ -168,6 +154,21 @@ document.addEventListener("DOMContentLoaded", () => {
     clearCanvas();
   };
 
+  const initCanvasSize = () => {
+    if (!canvas) return;
+    const parentWidth = canvas.parentElement
+      ? canvas.parentElement.clientWidth
+      : 480;
+    const width = Math.min(parentWidth, 520);
+    const height = width * billiard.height;
+    canvas.width = width;
+    canvas.height = height;
+
+    ctx = canvas.getContext("2d");
+    clearCanvas();
+    resetBall();
+  };
+
   const drawBallStep = (dt, roughness) => {
     if (!ctx || !canvas || !ball) return;
     const { width, height } = canvas;
@@ -179,19 +180,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let collided = false;
 
-    if (ball.x <= 5 || ball.x >= width - 5) {
+    // simple rectangular “trap” with a soft margin
+    const r = 5;
+    if (ball.x <= r || ball.x >= width - r) {
       ball.vx *= -1;
       collided = true;
-      ball.x = Math.max(5, Math.min(width - 5, ball.x));
+      ball.x = Math.max(r, Math.min(width - r, ball.x));
     }
-    if (ball.y <= 5 || ball.y >= height - 5) {
+    if (ball.y <= r || ball.y >= height - r) {
       ball.vy *= -1;
       collided = true;
-      ball.y = Math.max(5, Math.min(height - 5, ball.y));
+      ball.y = Math.max(r, Math.min(height - r, ball.y));
     }
 
+    // roughness = angle jitter on each collision
     if (collided && roughness > 0) {
-      const maxJitter = 0.3; // radians
+      const maxJitter = 0.3; // radians; scaled by slider
       const jitter =
         (Math.random() * 2 - 1) * maxJitter * roughness;
       const speed = Math.hypot(ball.vx, ball.vy) || 140;
@@ -201,12 +205,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     ctx.save();
+    // draw path segment
     ctx.beginPath();
     ctx.strokeStyle = "rgba(56, 189, 248, 0.7)";
     ctx.lineWidth = 1.2;
     ctx.moveTo(oldX, oldY);
     ctx.lineTo(ball.x, ball.y);
     ctx.stroke();
+
+    // draw current "ion"
+    ctx.beginPath();
+    ctx.fillStyle = "#f97316";
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = "rgba(249, 115, 22, 0.9)";
+    ctx.arc(ball.x, ball.y, 4, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
   };
 
@@ -221,6 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ? parseFloat(roughnessSlider.value)
       : 0;
 
+    // clamp dt so tab switching doesn't jump the ball
     drawBallStep(Math.min(delta, 0.03), roughness);
     requestAnimationFrame(animate);
   };
@@ -231,9 +245,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (roughnessSlider && roughnessValue) {
-    roughnessValue.textContent = Number(roughnessSlider.value).toFixed(2);
+    roughnessValue.textContent = Number(
+      roughnessSlider.value
+    ).toFixed(2);
     roughnessSlider.addEventListener("input", () => {
-      roughnessValue.textContent = Number(roughnessSlider.value).toFixed(2);
+      roughnessValue.textContent = Number(
+        roughnessSlider.value
+      ).toFixed(2);
     });
   }
 

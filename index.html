@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>From Billiards to Qubits | Quantum Chaos & You</title>
+  <title>From Billiards to Qubits | Quantum Chaos &amp; You</title>
   <meta
     name="description"
     content="An interactive tour from bouncing balls (billiards) to quantum bits, chaos, and trapped-ion noise — and how you can get involved in research."
   />
 
-  <!-- Fonts: heading + mono body (Courier-ish) -->
+  <!-- Fonts: heading + mono body (Courier‑ish) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -17,7 +17,9 @@
     rel="stylesheet"
   />
 
-  <link rel="stylesheet" href="style.css" />
+  <!-- NOTE: The original HTML referenced a non‑existent style.css file. -->
+  <!-- The stylesheet in this repository is named styles.css, so update the href accordingly. -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <!-- Top Navigation -->
@@ -31,7 +33,7 @@
         <a href="#start">Start here</a>
         <a href="#billiards">Interactive demo</a>
         <a href="#thesis">My thesis</a>
-        <a href="#cta">Get involved</a>
+        <!-- Removed call‑to‑action link; the CTA section no longer exists -->
         <a href="#sources">Sources</a>
       </nav>
       <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
@@ -57,7 +59,7 @@
 
           <div class="hero-actions">
             <a href="#start" class="btn primary">Start with the basics ⬇</a>
-            <a href="#cta" class="btn ghost">I want to help build quantum tech →</a>
+            <!-- Removed secondary CTA button to a deleted section -->
           </div>
 
           <p class="hero-tagline">
@@ -162,11 +164,11 @@
     <section id="billiards" class="section section-alt">
       <div class="section-inner">
         <header class="section-header">
-          <h2>Play with a toy billiard: how roughness creates chaos</h2>
+          <h2>Explore a double pendulum: chaotic motion in real time</h2>
           <p>
-            This is a <em>simplified</em> billiard. A point “particle” bounces
-            inside a box. You control the <strong>surface roughness</strong>.
-            As roughness increases, the trajectory becomes harder to predict.
+            Watch how two connected pendulums swing in complex, seemingly
+            unpredictable patterns. Adjust the <strong>damping</strong> (a kind
+            of friction) to see how it affects the motion.
           </p>
         </header>
 
@@ -174,22 +176,22 @@
           <div class="billiard-canvas-wrap card">
             <div class="billiard-header">
               <span class="badge">Interactive</span>
-              <span class="billiard-label">Toy billiard demo (not exact physics)</span>
+              <span class="billiard-label">Double pendulum demo</span>
             </div>
-            <canvas id="billiard-canvas" width="480" height="320">
+            <canvas id="billiard-canvas" width="480" height="360">
               Your browser doesn’t support canvas.
             </canvas>
             <div class="billiard-controls">
-              <label class="slider-label" for="roughness">
-                Surface roughness / noise
-                <span id="roughness-value">0.00</span>
+              <label class="slider-label" for="damping">
+                Damping factor
+                <span id="damping-value">0.00</span>
               </label>
               <input
-                id="roughness"
+                id="damping"
                 type="range"
                 min="0"
-                max="1"
-                step="0.01"
+                max="0.2"
+                step="0.005"
                 value="0"
               />
               <div class="billiard-buttons">
@@ -197,7 +199,7 @@
                   ▶ Start
                 </button>
                 <button id="billiard-reset" class="btn small ghost">
-                  Reset path
+                  Reset
                 </button>
               </div>
             </div>
@@ -207,24 +209,23 @@
             <h3>What this is actually showing</h3>
             <ul class="bullets">
               <li>
-                The particle moves in straight lines and reflects off the walls
-                like a laser on mirrors.
+                Two pendulums are connected end‑to‑end. Their motion is coupled,
+                leading to rich, chaotic dynamics even with simple physics.
               </li>
               <li>
-                With <strong>roughness = 0</strong>, reflections are perfectly
-                clean, and the path is regular.
+                With <strong>zero damping</strong>, energy is conserved and the
+                swings can be wild and long‑lasting.
               </li>
               <li>
-                As you <strong>increase roughness</strong>, each bounce gets a
-                tiny random nudge. Those tiny changes accumulate and the path
-                becomes scrambled.
+                As you <strong>increase damping</strong>, friction slows things
+                down and the motion eventually settles.
               </li>
             </ul>
             <p class="muted">
-              In a real ion trap, “roughness” could correspond to microscopic
-              surface defects and patch potentials. The math tools we use for
-              billiards (Lyapunov exponents, monodromy matrices) tell us how
-              sensitive the system is to those imperfections.
+              The double pendulum is a classic example of deterministic chaos:
+              small changes in initial angles or friction lead to drastically
+              different trajectories. This illustrates why predicting noisy
+              systems — like ion traps — can be so challenging.
             </p>
           </div>
         </div>
@@ -460,56 +461,7 @@
       </div>
     </section>
 
-    <!-- CALL TO ACTION -->
-    <section id="cta" class="section">
-      <div class="section-inner">
-        <header class="section-header">
-          <h2>Want to work on this (or something nearby)?</h2>
-          <p>
-            This project lives at the intersection of geometry, dynamical
-            systems, quantum information, and hardware. If you’re at a
-            university and any of those words spark joy, you can absolutely
-            contribute.
-          </p>
-        </header>
-
-        <div class="cta-grid">
-          <article class="card">
-            <h3>1. Students at my university</h3>
-            <p>
-              If you’re at UMass (or nearby), there are options:
-            </p>
-            <ul class="bullets">
-              <li>Independent study / reading course</li>
-              <li>Honors thesis / senior project</li>
-              <li>Side-project research (simulations, notes, visualizations)</li>
-            </ul>
-            <p>
-              👉 <a href="mailto:your.email@umass.edu" class="link-underline"
-                >Email me</a
-              >
-              with a short note about your background + what excites you.
-            </p>
-          </article>
-
-          <article class="card">
-            <h3>2. Not at my school?</h3>
-            <p>
-              You can still:
-            </p>
-            <ul class="bullets">
-              <li>Fork this site and adapt it to your own project</li>
-              <li>Start by learning the basics (see sources below)</li>
-              <li>Build your own simulations and share them</li>
-            </ul>
-            <p class="muted">
-              The demand for people who understand both math and quantum
-              hardware is only going up.
-            </p>
-          </article>
-        </div>
-      </div>
-    </section>
+    <!-- Call‑to‑action section removed as per updated design -->
 
     <!-- SOURCES -->
     <section id="sources" class="section section-alt">
@@ -586,10 +538,7 @@
         Built as part of an undergraduate thesis on billiards, chaos, and
         trapped-ion noise. Feel free to fork and remix.
       </p>
-      <p class="muted small">
-        Theme: dark/light mode, monospaced aesthetic, and minimal JS. Hosted
-        on GitHub Pages.
-      </p>
+      <!-- Removed theme/footer tagline as requested -->
     </div>
   </footer>
 

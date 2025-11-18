@@ -33,20 +33,22 @@
 }
 
 :root[data-theme="light"] {
-  --bg: #f8fafc;
-  --bg-alt: #e5f0ff;
+  /* Softer neutral light theme with a subtle blue accent */
+  --bg: #f5f7fb;
+  --bg-alt: #e2e8f0;
   --bg-elevated: #ffffff;
-  --border-subtle: rgba(148, 163, 184, 0.4);
+  --border-subtle: rgba(15, 23, 42, 0.08);
 
-  --text: #0f172a;
+  --text: #020617;
   --muted: #64748b;
 
-  --accent: #0ea5e9;
-  --accent-soft: rgba(56, 189, 248, 0.12);
-  --accent-strong: #0284c7;
+  --accent: #2563eb;
+  --accent-soft: rgba(37, 99, 235, 0.12);
+  --accent-strong: #1d4ed8;
 
-  --pill-bg: rgba(255, 255, 255, 0.95);
+  --pill-bg: rgba(255, 255, 255, 0.92);
 }
+
 
 /* =========
    GLOBAL RESET
@@ -71,10 +73,25 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
 }
+
+/* Light vs dark specific backgrounds */
+html[data-theme="light"] body {
+  background: radial-gradient(
+    circle at top left,
+    #e0f2fe 0,
+    var(--bg) 55%
+  );
+}
+
+html[data-theme="dark"] body {
+  background: radial-gradient(
+    circle at top left,
+    #020617 0,
+    var(--bg) 45%
+  );
+}
+
 
 img {
   max-width: 100%;
@@ -690,6 +707,39 @@ code {
   flex-direction: column;
   gap: 0.35rem;
 }
+
+/* Light-mode specific cleanups */
+
+html[data-theme="light"] .navbar {
+  background: radial-gradient(
+    circle at top left,
+    rgba(191, 219, 254, 0.9) 0,
+    rgba(248, 250, 252, 0.96) 40%
+  );
+  border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+html[data-theme="light"] .section-alt {
+  background: linear-gradient(
+    145deg,
+    #f9fafb,
+    #e2e8f0
+  );
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+html[data-theme="light"] .footer {
+  background: #f9fafb;
+  border-top: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+/* Light toggle pill: less goth in light mode */
+html[data-theme="light"] .theme-toggle {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(148, 163, 184, 0.6);
+}
+
 
 /* =========
    UTILITIES & ANIMATIONS

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>From Billiards to Qubits | Quantum Chaos &amp; You</title>
+  <meta
+    name="description"
+    content="An interactive tour from bouncing balls (billiards) to quantum bits, chaos, and trapped-ion noise — and how you can get involved in research."
+  />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#hero" class="logo">
+        <span class="logo-pill">QC</span>
+        <span class="logo-text">Quantum Chaos</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#why">Why this matters</a>
+        <a href="#billiards">Billiards</a>
+        <a href="#qubit-demo">Noisy Qubit</a>
+        <a href="#thesis">My thesis</a>
+      </nav>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+        ☀️
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section id="hero" class="section hero visible">
+      <div class="section-inner hero-grid">
+        <div class="hero-text">
+          <p class="eyebrow">From bouncing balls to quantum bits</p>
+          <h1>Chaos, Quantum Computers, &amp; Why Your Brain is Perfect for This</h1>
+          <p class="hero-subtitle">
+            We start with a ball bouncing in a weirdly shaped room (a
+            <strong>billiard</strong>), and end up talking about
+            <strong>noise in quantum computers</strong>. Along the way, you’ll
+            get intuition, play with interactive demos, and see exactly
+            how you could work on this as an undergrad.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#why" class="btn primary">See why this matters ⬇</a>
+          </div>
+
+          <p class="hero-tagline">
+            A thesis project by <span class="highlight">Ayush</span> ·
+            Math × ECE
+          </p>
+        </div>
+
+        <div class="hero-card">
+          <div class="hero-orbit">
+            <div class="hero-orbit-inner">
+              <span class="orbit-dot"></span>
+            </div>
+            <canvas id="mini-orbit" aria-hidden="true"></canvas>
+          </div>
+          <div class="hero-card-body">
+            <h2>Big Idea</h2>
+            <p>
+              Use <strong>non-standard billiards</strong> to understand how
+              tiny imperfections can cause
+              <strong>chaotic amplification</strong> — and connect that to
+              <strong>unexpected heating</strong> in trapped-ion quantum
+              computers.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="why" class="section section-alt">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Why this matters (The "So What?")</h2>
+          <p>
+            This isn’t just a math puzzle. If we understand how geometry and
+            chaos control noise, we can design <strong>better quantum
+            devices</strong>.
+          </p>
+        </header>
+
+        <div class="cards-grid">
+          <article class="card">
+            <h3>1. Better intuition for noise</h3>
+            <p>
+              Noise in quantum devices is often treated as a black box.
+              Billiards let us build <em>geometric intuition</em> for when
+              instability and heating will appear.
+            </p>
+          </article>
+          <article class="card">
+            <h3>2. Design rules for hardware</h3>
+            <p>
+              If certain shapes and configurations are inherently more stable,
+              that’s a design rule. We can use math to rule out bad geometries
+              before spending time and money in the lab.
+            </p>
+          </article>
+          <article class="card">
+            <h3>3. Cross-disciplinary playground</h3>
+            <p>
+              This project sits at the intersection of
+              <strong>math, physics, CS, and stats</strong>. There is room for
+              simulations, proofs, data analysis, and software.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="start" class="section">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>The Basics: What are we actually talking about?</h2>
+        </header>
+
+        <div class="cards-grid">
+          <article class="card basics-card">
+            <h3>What is a qubit?</h3>
+            <p>
+              A <strong>qubit</strong> is like a bit, but it can be in a
+              combination of <code>|0⟩</code> and <code>|1⟩</code>. You can picture it as a point on a sphere (the
+              <em>Bloch sphere</em>).
+            </p>
+          </article>
+
+          <article class="card basics-card">
+            <h3>What is "noise"?</h3>
+            <p>
+              Noise is any random disturbance (stray fields, roughness) that nudges the quantum state
+              away from where it’s supposed to be.
+            </p>
+          </article>
+
+          <article class="card basics-card">
+            <h3>What is chaos?</h3>
+            <p>
+              Chaos is when a system follows strict rules, but <strong>tiny changes in initial
+              conditions explode</strong> over time.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="billiards" class="section section-alt">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Demo 1: Classical Chaos</h2>
+          <p>
+            This <strong>billiard</strong> represents an ion bouncing in a trap. 
+            Increase the roughness to see how tiny wall imperfections create chaos.
+          </p>
+        </header>
+
+        <div class="billiard-layout">
+          <div class="billiard-canvas-wrap card">
+            <div class="billiard-header">
+              <span class="badge">Simulation</span>
+              <span class="billiard-label">Geometric Noise</span>
+            </div>
+            <canvas id="billiard-canvas" width="480" height="360">
+              Your browser doesn’t support canvas.
+            </canvas>
+            <div class="billiard-controls">
+              <label class="slider-label" for="roughness">
+                Wall roughness
+                <span id="roughness-value">0.20</span>
+              </label>
+              <input
+                id="roughness"
+                type="range"
+                min="0"
+                max="1.2"
+                step="0.05"
+                value="0.2"
+              />
+              <div class="billiard-buttons">
+                <button id="billiard-toggle" class="btn small primary">▶ Start</button>
+                <button id="billiard-reset" class="btn small ghost">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="billiard-explainer card">
+            <h3>What to look for</h3>
+            <ul class="bullets">
+              <li><strong>Zero Roughness:</strong> The path is predictable. It remembers where it came from.</li>
+              <li><strong>High Roughness:</strong> Every bounce adds a random kick. The path fills the space chaotically.</li>
+            </ul>
+            <p class="muted">
+              This "chaotic heating" in the classical world maps onto anomalous heating in the quantum world.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="qubit-demo" class="section">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Demo 2: Quantum Noise (Rabi Flopping)</h2>
+          <p>
+            This is a qubit undergoing a <strong>Rabi oscillation</strong> (flipping from 0 to 1). 
+            See what happens when we add "noise" to the system.
+          </p>
+        </header>
+
+        <div class="billiard-layout">
+          <div class="billiard-canvas-wrap card">
+            <div class="billiard-header">
+              <span class="badge">Simulation</span>
+              <span class="billiard-label">Bloch Sphere Representation</span>
+            </div>
+            <canvas id="qubit-canvas" width="480" height="360"></canvas>
+            
+            <div class="billiard-controls">
+              <label class="slider-label" for="qubit-noise">
+                System Noise / Temperature
+                <span id="qubit-noise-value">0.00</span>
+              </label>
+              <input
+                id="qubit-noise"
+                type="range"
+                min="0"
+                max="0.5"
+                step="0.01"
+                value="0"
+              />
+              <div class="billiard-buttons">
+                <button id="qubit-toggle" class="btn small primary">▶ Start</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="billiard-explainer card">
+            <h3>What is happening?</h3>
+            <ul class="bullets">
+              <li><strong>The Arrow:</strong> Represents the state of the qubit. Up is |0⟩, Down is |1⟩.</li>
+              <li><strong>The Motion:</strong> Ideally, we apply a pulse to rotate it smoothly (Rabi oscillation).</li>
+              <li><strong>The Noise:</strong> As you increase noise, the arrow jitters. In a real experiment, this destroys the information (decoherence).</li>
+            </ul>
+            <p class="muted">
+              My thesis explores how the geometric chaos from Demo 1 causes the state noise you see here in Demo 2.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="thesis" class="section section-alt">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>My thesis in one picture and a few sentences</h2>
+        </header>
+
+        <div class="thesis-grid">
+          <article class="card thesis-card">
+            <h3>1. Non-standard billiards</h3>
+            <p>I look at billiards with gravity and rough walls—regimes where standard textbook theory breaks.</p>
+          </article>
+
+          <article class="card thesis-card">
+            <h3>2. Stability &amp; chaos</h3>
+            <p>Using Monodromy matrices and Lyapunov exponents to measure how fast trajectories separate.</p>
+          </article>
+
+          <article class="card thesis-card">
+            <h3>3. Connection to ion traps</h3>
+            <p>Connecting geometric instability to the actual heating rates observed in lab hardware.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="paths" class="section">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Choose your path into quantum &amp; chaos</h2>
+        </header>
+
+        <div class="paths-layout">
+          <div class="card">
+            <div class="path-buttons">
+              <button class="btn pill path-btn" data-path="math">I’m a math brain 🧮</button>
+              <button class="btn pill path-btn" data-path="cs">I’m a coder 🧑‍💻</button>
+              <button class="btn pill path-btn" data-path="physics">I’m a physics / ECE person ⚡</button>
+            </div>
+            <div id="path-output" class="path-output">
+              <p class="muted">Select a background above.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sources" class="section section-alt">
+      <div class="section-inner">
+        <header class="section-header">
+          <h2>Sources &amp; further reading</h2>
+        </header>
+        <div class="cards-grid">
+          <article class="card">
+            <h3>Billiards &amp; chaos</h3>
+            <ul class="bullets">
+              <li>Gutzwiller, <em>Chaos in Classical and Quantum Mechanics</em></li>
+              <li>Chernov &amp; Markarian, <em>Chaotic Billiards</em></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="section-inner footer-inner">
+      <p>Built as part of an undergraduate thesis on billiards, chaos, and trapped-ion noise.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
